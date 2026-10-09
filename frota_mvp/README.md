@@ -86,22 +86,4 @@ Acesse: http://127.0.0.1:8000/
 6. Tente excluir uma rota que já tem viagem: o sistema bloqueia
 7. Confira no MySQL: `SELECT * FROM frota_rota;`
 
-Testes automatizados: `python manage.py test` (usam um banco temporário; o
-usuário do MySQL precisa de permissão para criar bancos).
 
-## Estrutura
-
-```text
-projeto_mvp/   configurações e URLs principais
-usuarios/      cadastro, login, logout e plataforma
-frota/         models, forms, views e templates dos CRUDs e das viagens
-templates/     base.html (layout comum)
-```
-
-- **Model**: representa os dados (uma tabela por classe).
-- **Form**: recebe e valida os dados enviados pelo usuário.
-- **View**: processa a requisição e devolve a página.
-- **URL**: aponta cada endereço para uma View.
-- **Template**: HTML que apresenta os dados.
-- **ORM**: converte o código Python em consultas SQL ao MySQL.
-- **Migration**: registra as mudanças na estrutura do banco.
