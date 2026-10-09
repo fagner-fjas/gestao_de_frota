@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block titulo %}Base{% endblock %}
+{% block conteudo %}
+<h1>Plataforma</h1>
+<p>Usuário: {{ request.user.username }} </p>
+
+<h2>Cadastros</h2>
+<ul>
+  <li><a href="{% url 'rota_lista' %}">Rotas</a></li>
+  <li><a href="{% url 'motorista_lista' %}">Motoristas</a></li>
+  <li><a href="{% url 'veiculo_lista' %}">Veículos</a></li>
+  <li><a href="{% url 'passageiro_lista' %}">Passageiros</a></li>
+</ul>
+
+<h2>Agendamento</h2>
+<ul>
+  <li><a href="{% url 'viagem_lista' %}">Agendamento de viagens</a></li>
+</ul>
+{% endblock %}
+
+

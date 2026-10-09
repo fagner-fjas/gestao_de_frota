@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block titulo %}Cadastro de usuário{% endblock %}
+{% block conteudo %}
+<h1>Cadastro de usuário</h1>
+<form method="post">
+  {% csrf_token %}
+  <p><label>Usuário:<br><input type="text" name="username" required autofocus></label></p>
+  <p><label>E-mail:<br><input type="email" name="email"></label></p>
+  <p><label>Senha:<br><input type="password" name="password" required></label></p>
+  <button type="submit" class="botao">Cadastrar</button>
+</form>
+<p><a href="{% url 'login' %}">Já tenho conta</a></p>
+{% endblock %}

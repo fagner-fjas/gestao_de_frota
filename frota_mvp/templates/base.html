@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}A{% endblock %} - A</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; color: #222; }
+    nav { background: #1564c0; padding: 10px 20px; }
+    nav a { color: #fff; margin-right: 16px; text-decoration: none; }
+    main { padding: 20px; max-width: 1000px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 12px; }
+    th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: left; }
+    th { background: #eef3fb; }
+    .botao { background: #1564c0; color: #fff; padding: 6px 12px; text-decoration: none; border: 0; cursor: pointer; }
+    .mensagem { padding: 8px 12px; margin: 10px 0; border-left: 4px solid; }
+    .mensagem.success { background: #e8f5e9; border-color: #2e7d32; }
+    .mensagem.error { background: #fdecea; border-color: #c62828; }
+    .errorlist { color: #c62828; margin: 2px 0; padding-left: 18px; }
+    .busca { margin: 12px 0; }
+  </style>
+</head>
+<body>
+  <nav>
+    {% if user.is_authenticated %}
+      <a href="{% url 'plataforma' %}">Plataforma</a>
+      <a href="{% url 'rota_lista' %}">Rotas</a>
+      <a href="{% url 'motorista_lista' %}">Motoristas</a>
+      <a href="{% url 'veiculo_lista' %}">Veículos</a>
+      <a href="{% url 'passageiro_lista' %}">Passageiros</a>
+      <a href="{% url 'viagem_lista' %}">Viagens</a>
+      <a href="{% url 'logout' %}">Sair ({{ user.username }})</a>
+    {% else %}
+      <a href="{% url 'login' %}">Login</a>
+    {% endif %}
+  </nav>
+  <main>
+    {% for mensagem in messages %}
+      <div class="mensagem {{ mensagem.tags }}">{{ mensagem }}</div>
+    {% endfor %}
+    {% block conteudo %}{% endblock %}
+  </main>
+</body>
+</html>

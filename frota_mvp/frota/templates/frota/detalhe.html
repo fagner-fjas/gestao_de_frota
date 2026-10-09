@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block titulo %}{{ nome|capfirst }} #{{ object.pk }}{% endblock %}
+{% block conteudo %}
+<h1>{{ nome|capfirst }} #{{ object.pk }}</h1>
+<table>
+  {% for rotulo, valor in dados %}
+    <tr><th style="width:30%">{{ rotulo|capfirst }}</th><td>{{ valor }}</td></tr>
+  {% endfor %}
+</table>
+
+{% block acoes_extras %}{% endblock %}
+
+<p>
+  <a class="botao" href="{% url url_base|add:'_editar' object.pk %}">Editar</a>
+  <a class="botao" href="{% url url_base|add:'_excluir' object.pk %}">Excluir</a>
+  <a href="{% url url_base|add:'_lista' %}">Voltar à lista</a>
+</p>
+{% endblock %}

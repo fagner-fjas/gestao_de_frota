@@ -1,0 +1,11 @@
+{% extends 'base.html' %} 
+{% block titulo %}Excluir {{ nome }}{% endblock %}
+{% block conteudo %}
+<h1>Excluir {{ nome }}</h1>
+<p>Deseja realmente excluir <strong>{{ object }}</strong>? Esta ação não pode ser desfeita.</p>
+<form method="post">
+  {% csrf_token %}
+  <button type="submit" class="botao">Sim, excluir</button>
+  <a href="{% url url_base|add:'_detalhe' object.pk %}">Cancelar</a>
+</form>
+{% endblock %}

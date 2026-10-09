@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block titulo %}{{ nome_plural|capfirst }}{% endblock %}
+{% block conteudo %}
+<h1>{{ nome_plural|capfirst }}</h1>
+<p><a class="botao" href="{% url url_base|add:'_nova' %}">Novo cadastro</a></p>
+
+<form method="get" class="busca">
+  <input type="text" name="q" value="{{ q }}" placeholder="Buscar...">
+  {% if status_choices %}
+    <select name="status">
+      <option value="">Todos os status</option>
+      {% for valor, rotulo in status_choices %}
+        <option value="{{ valor }}" {% if valor == status %}selected{% endif %}>{{ rotulo }}</option>
+      {% endfor %}
+    </select>
+  {% endif %}
+  <button type="submit">Buscar</button>
+  <a href="{% url url_base|add:'_lista' %}">Limpar</a>
+</form>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      {% for cabecalho in cabecalhos %}<th>{{ cabecalho }}</th>{% endfor %}
+      <th>Ações</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for obj, valores in linhas %}
+      <tr>
+        <td>{{ obj.pk }}</td>
+        {% for valor in valores %}<td>{{ valor }}</td>{% endfor %}
+        <td>
+          <a href="{% url url_base|add:'_detalhe' obj.pk %}">Ver</a> |
+          <a href="{% url url_base|add:'_editar' obj.pk %}">Editar</a> |
+          <a href="{% url url_base|add:'_excluir' obj.pk %}">Excluir</a>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="{{ cabecalhos|length|add:2 }}">Nenhum registro encontrado.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% if is_paginated %}
+  <p>
+    Página {{ page_obj.number }} de {{ paginator.num_pages }}
+    {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}&q={{ q|urlencode }}&status={{ status|urlencode }}">« Anterior</a>
+    {% endif %}
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}&q={{ q|urlencode }}&status={{ status|urlencode }}">Próxima »</a>
+    {% endif %}
+  </p>
+{% endif %}
+{% endblock %}
