@@ -76,14 +76,3 @@ Acesse: http://127.0.0.1:8000/
 | Viagens             | `/viagens/`          |
 
 
-## Como testar os CRUDs
-
-1. Cadastre-se em `/auth/cadastro/` e faça login
-2. Crie 1 rota, 1 motorista, 1 veículo e 1 passageiro
-3. Em cada lista: confira o registro, busque, abra (Ver), edite e exclua
-4. Em `/viagens/nova/`, agende uma viagem com data futura
-5. Na tela da viagem, use Iniciar / Concluir / Cancelar
-6. Tente excluir uma rota que já tem viagem: o sistema bloqueia
-7. Confira no MySQL: `SELECT * FROM frota_rota;`
-
-
