@@ -52,7 +52,3 @@ docker compose up --build
 ```
 
 
-
-As migrações rodam automaticamente na subida
-
-
