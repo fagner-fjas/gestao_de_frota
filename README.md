@@ -1,78 +1,54 @@
 
-## Ambiente Virtual
-```bash
-python -m venv venv
-source venv/bin/activate 
-pip install -r requirements.txt
-```
 
-## Configurar o MySQL
 
-1. Abra o cliente do MySQL (`mys sql -u root -p`) e crie o banco (uma única vez):
 
-   ```sql
-   CREATE DATABASE frota_mvp CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-   ```
+---
 
-2. Informe ao Django a senha do seu MySQL. Duas opções:
+## Rodar com Docker
 
-   - Editar o valor padrão de `PASSWORD` em `projeto_mvp/settings.py`; **ou**
-   - Definir variáveis de ambiente (não vão para o Git):
 
-     ```bash
-     export DB_PASSWORD="sua_senha"      
-     ```
+### 1. Pré-requisitos
 
-   Também existem `DB_USER`, `DB_NAME`, `DB_HOST` e `DB_PORT` (padrões:
-   `root`, `frota_mvp`, `127.0.0.1`, `3306`).
+- [Docker](https://docs.docker.com/engine/install/) e Docker Compose v
 
-## Criar as tabelas (migrations)
+Teste com:
 
 ```bash
-python manage.py makemigrations
-python manage.py migrate
+docker --version
+docker compose version
 ```
 
-## Criar um usuário
-
-Pelo próprio sistema (recomendado): acesse `/auth/cadastro/`.
-
-Para o painel administrativo (`/admin/`), crie um superusuário:
+### 2. Clonar o projeto
 
 ```bash
-python manage.py createsuperuser
+git clone https://github.com/fagner-fjas/gestao_de_frota.git
+cd gestao_de_frota
 ```
 
-## Executar
+### 3. Criar o arquivo `.env`
+
+Criar .env e compor por: 
+
+Conteúdo esperado:
+
+```
+DJANGO_SECRET_KEY=troque-por-uma-chave
+DJANGO_DEBUG=1
+DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
+
+DB_NAME=frota_mvp
+DB_USER=frota_user
+DB_PASSWORD=troque-essa-senha
+DB_ROOT_PASSWORD=troque-essa-senha-root
+DB_HOST=db
+DB_PORT=3306
+```
+
+
+### 4. Subir os containers
 
 ```bash
-python manage.py runserver
+docker compose up --build
 ```
-
-Acesse: http://127.0.0.1:8000/
-
-## Telas
-
-| Tela                | Endereço             |
-
-| Cadastro de usuário | `/auth/cadastro/`    |
-
-
-| Login               | `/auth/login/`       |
-
-
-| Plataforma          | `/auth/plataforma/`  |
-
-
-| Rotas               | `/rotas/`            |
-
-| Motoristas          | `/motoristas/`       |
-
-| Veículos            | `/veiculos/`         |
-
-| Passageiros         | `/passageiros/`      |
-
-
-| Viagens             | `/viagens/`          |
 
 
