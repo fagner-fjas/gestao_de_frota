@@ -1,11 +1,45 @@
 {% extends 'base.html' %}
+{% load ui %}
 {% block titulo %}{% if object %}Editar{% else %}Cadastrar{% endif %} {{ nome }}{% endblock %}
 {% block conteudo %}
-<h1>{% if object %}Editar{% else %}Cadastrar{% endif %} {{ nome }}</h1>
-<form method="post">
+<h1 class="mb-6 text-title-xs font-semibold text-gray-800">{% if object %}Editar{% else %}Cadastrar{% endif %} {{ nome }}</h1>
+
+<form method="post" class="cartao max-w-3xl">
   {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit" class="botao">Salvar</button>
-  <a href="{% url url_base|add:'_lista' %}">Cancelar</a>
+
+  {% if form.non_field_errors %}
+    <div class="mb-5 rounded-xl border border-error-500 bg-error-50 p-4 text-sm text-error-700">
+      {% for erro in form.non_field_errors %}<p>{{ erro }}</p>{% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+    {% for campo in form %}
+      <div class="{% if campo.field.widget.allow_multiple_selected or campo.name == 'observacoes' %}md:col-span-2{% endif %}">
+        {% if campo.field.widget.input_type == 'checkbox' and not campo.field.widget.allow_multiple_selected %}
+          <label class="flex items-center gap-2 text-sm font-medium text-gray-700">
+            {{ campo }} {{ campo.label }}
+          </label>
+        {% else %}
+          <label for="{{ campo.id_for_label }}" class="rotulo">{{ campo.label }}</label>
+          {% if campo.field.widget.allow_multiple_selected and campo.field.widget.input_type == 'checkbox' %}
+            <div class="space-y-2 rounded-lg border border-gray-200 p-3 text-sm text-gray-700 [&_input]:size-4 [&_input]:rounded [&_label]:flex [&_label]:items-center [&_label]:gap-2">
+              {{ campo }}
+            </div>
+          {% else %}
+            {{ campo|estilizar }}
+          {% endif %}
+        {% endif %}
+
+        {% if campo.help_text %}<p class="mt-1 text-xs text-gray-500">{{ campo.help_text }}</p>{% endif %}
+        {% for erro in campo.errors %}<p class="mt-1 text-xs text-error-600">{{ erro }}</p>{% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="mt-6 flex gap-3">
+    <button type="submit" class="botao-primario">Salvar</button>
+    <a href="{% url url_base|add:'_lista' %}" class="botao-secundario">Cancelar</a>
+  </div>
 </form>
 {% endblock %}

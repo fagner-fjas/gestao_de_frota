@@ -1,18 +1,31 @@
 {% extends 'base.html' %}
+{% load ui %}
 {% block titulo %}{{ nome|capfirst }} #{{ object.pk }}{% endblock %}
 {% block conteudo %}
-<h1>{{ nome|capfirst }} #{{ object.pk }}</h1>
-<table>
-  {% for rotulo, valor in dados %}
-    <tr><th style="width:30%">{{ rotulo|capfirst }}</th><td>{{ valor }}</td></tr>
-  {% endfor %}
-</table>
+<h1 class="mb-6 text-title-xs font-semibold text-gray-800">{{ nome|capfirst }} #{{ object.pk }}</h1>
 
-{% block acoes_extras %}{% endblock %}
+<div class="cartao max-w-3xl">
+  <dl class="divide-y divide-gray-100">
+    {% for rotulo, valor in dados %}
+      <div class="grid grid-cols-1 gap-1 py-3 sm:grid-cols-3 sm:gap-4">
+        <dt class="text-sm font-medium text-gray-500">{{ rotulo|capfirst }}</dt>
+        <dd class="text-sm text-gray-800 sm:col-span-2">
+          {% with classes=valor|badge %}
+            {% if classes %}
+              <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium {{ classes }}">{{ valor }}</span>
+            {% else %}{{ valor }}{% endif %}
+          {% endwith %}
+        </dd>
+      </div>
+    {% endfor %}
+  </dl>
 
-<p>
-  <a class="botao" href="{% url url_base|add:'_editar' object.pk %}">Editar</a>
-  <a class="botao" href="{% url url_base|add:'_excluir' object.pk %}">Excluir</a>
-  <a href="{% url url_base|add:'_lista' %}">Voltar à lista</a>
-</p>
+  {% block acoes_extras %}{% endblock %}
+
+  <div class="mt-6 flex flex-wrap gap-3 border-t border-gray-100 pt-5">
+    <a href="{% url url_base|add:'_editar' object.pk %}" class="botao-primario">Editar</a>
+    <a href="{% url url_base|add:'_excluir' object.pk %}" class="botao-perigo">Excluir</a>
+    <a href="{% url url_base|add:'_lista' %}" class="botao-secundario">Voltar à lista</a>
+  </div>
+</div>
 {% endblock %}

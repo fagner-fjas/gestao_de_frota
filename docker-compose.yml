@@ -31,5 +31,16 @@ services:
       db:
         condition: service_healthy
 
+  tailwind:
+    build: .
+    container_name: gestao_frota_tailwind
+    command: python manage.py tailwind --skip-checks watch
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    tty: true          
+    stdin_open: true
+
 volumes:
   mysql_data:

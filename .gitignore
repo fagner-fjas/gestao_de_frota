@@ -10,3 +10,6 @@ db.sqlite3
 .idea/
 .vscode/
 .DS_Store
+
+assets/css/tailwind.css
+staticfiles/

@@ -1,0 +1,57 @@
+{% with caminho=request.path %}
+<div x-show="sidebarOpen" x-cloak @click="sidebarOpen = false"
+     class="fixed inset-0 z-9998 bg-gray-900/50 xl:hidden"></div>
+
+<aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+       class="fixed top-0 left-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-auto border-r border-gray-200 bg-white px-5 transition-transform duration-300 xl:static xl:translate-x-0">
+
+  <div class="flex items-center gap-3 pt-8 pb-7">
+    <span class="flex size-10 items-center justify-center rounded-xl bg-brand-500 text-white">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16V7a1 1 0 011-1h9v10M13 9h4l3 3v4h-7"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
+    </span>
+    <span class="text-lg font-semibold text-gray-800">Gestão de Frota</span>
+  </div>
+
+  <nav>
+    <h3 class="mb-4 text-xs leading-5 text-gray-400 uppercase">Menu</h3>
+    <ul class="flex flex-col gap-1">
+      <li>
+        <a href="{% url 'plataforma' %}" class="menu-item group {% if '/plataforma/' in caminho %}menu-item-active{% else %}menu-item-inactive{% endif %}">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          Painel
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'viagem_lista' %}" class="menu-item group {% if '/viagens/' in caminho %}menu-item-active{% else %}menu-item-inactive{% endif %}">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+          Viagens
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'rota_lista' %}" class="menu-item group {% if '/rotas/' in caminho %}menu-item-active{% else %}menu-item-inactive{% endif %}">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 10-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+          Rotas
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'veiculo_lista' %}" class="menu-item group {% if '/veiculos/' in caminho %}menu-item-active{% else %}menu-item-inactive{% endif %}">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16V7a1 1 0 011-1h9v10M13 9h4l3 3v4h-7"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
+          Veículos
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'motorista_lista' %}" class="menu-item group {% if '/motoristas/' in caminho %}menu-item-active{% else %}menu-item-inactive{% endif %}">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></svg>
+          Motoristas
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'passageiro_lista' %}" class="menu-item group {% if '/passageiros/' in caminho %}menu-item-active{% else %}menu-item-inactive{% endif %}">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0112 0"/><circle cx="17" cy="9" r="2.5"/><path d="M17 14a5 5 0 014 5"/></svg>
+          Passageiros
+        </a>
+      </li>
+    </ul>
+  </nav>
+</aside>
+{% endwith %}
