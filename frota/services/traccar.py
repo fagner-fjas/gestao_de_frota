@@ -1,7 +1,7 @@
-"""Adaptador legado: evita quebrar as views existentes durante a refatoração.
+"""Adaptador temporário para imports antigos da API Traccar.
 
-Novos recursos devem importar diretamente de `rastreamento.services`.
-Este módulo será removido somente após migrarmos a view do mapa.
+O mapa usa diretamente `rastreamento.services` desde a Entrega 4.
+Esta compatibilidade é mantida para outros consumidores e testes legados.
 """
 
 from rastreamento.services.client import (
