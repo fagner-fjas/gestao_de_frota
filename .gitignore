@@ -13,3 +13,6 @@ db.sqlite3
 
 assets/css/tailwind.css
 staticfiles/
+.django_tailwind_cli/
+.env.*.local
+*.zip

@@ -1,13 +1,14 @@
+# Ambiente de desenvolvimento / demonstração (não é configuração de produção).
+# Portas do host são configuráveis no .env para funcionar em outros PCs.
 services:
   db:
     image: mysql:8.4
-    container_name: gestao_frota_db
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_USER: ${DB_USER}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME:?Configure DB_NAME no .env}
+      MYSQL_USER: ${DB_USER:?Configure DB_USER no .env}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Configure DB_PASSWORD no .env}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?Configure DB_ROOT_PASSWORD no .env}
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
@@ -16,23 +17,25 @@ services:
       timeout: 5s
       retries: 30
       start_period: 120s
-      
+
   traccar:
     image: traccar/traccar:6.16.0
     restart: unless-stopped
     ports:
-      - "127.0.0.1:8082:8082"
-      - "192.168.1.227:5055:5055"
+      # Interface de administração acessível apenas no próprio PC.
+      - "127.0.0.1:${TRACCAR_WEB_PORT:-8082}:8082"
+      # Padrão local; para GPS na rede, configure IP do PC no .env.
+      - "${TRACCAR_DEVICE_BIND_IP:-127.0.0.1}:${TRACCAR_DEVICE_PORT:-5055}:5055"
     volumes:
       - traccar_data:/opt/traccar/data
       - traccar_logs:/opt/traccar/logs
 
   web:
     build: .
-    container_name: gestao_frota
+    restart: unless-stopped
     command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     ports:
-      - "8000:8000"
+      - "${WEB_BIND_IP:-127.0.0.1}:${WEB_PORT:-8000}:8000"
     volumes:
       - .:/app
     env_file:
@@ -43,13 +46,12 @@ services:
 
   tailwind:
     build: .
-    container_name: gestao_frota_tailwind
     command: python manage.py tailwind --skip-checks watch
     volumes:
       - .:/app
     env_file:
       - .env
-    tty: true          
+    tty: true
     stdin_open: true
 
 volumes:
