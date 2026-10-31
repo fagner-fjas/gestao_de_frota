@@ -2,13 +2,8 @@
 {% load static %}
 {% block titulo %}Painel operacional{% endblock %}
 {% block conteudo %}
-<!-- Entrega 6: hierarquia visual do painel de operação, mantendo o TailAdmin do MVP. -->
 <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
   <div>
-    <div class="mb-2 inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-500">
-      <span class="h-2 w-2 rounded-full bg-brand-500"></span>
-      Painel operacional · {{ hoje|date:"d/m/Y" }}
-    </div>
     <h1 class="text-title-xs font-semibold text-gray-800">Olá, {{ request.user.username }}</h1>
     <p class="mt-1 text-sm text-gray-500">Acompanhe os indicadores, organize as próximas viagens e consulte o rastreamento da frota.</p>
   </div>
@@ -18,7 +13,6 @@
   </a>
 </div>
 
-<!-- Indicadores atuais: não alteramos cálculo, apenas a apresentação. -->
 <section aria-label="Indicadores da frota" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 md:gap-6">
   <div class="cartao">
     <div class="flex items-center justify-between">
@@ -62,7 +56,6 @@
   </div>
 </section>
 
-<!-- O usuário encontra primeiro as viagens e ações operacionais. -->
 <section aria-label="Operação da frota" class="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-12 md:gap-6">
   <div class="cartao min-w-0 xl:col-span-8">
     <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -115,7 +108,6 @@
   </aside>
 </section>
 
-<!-- GPS sempre como ÚLTIMA seção: mantém a visão administrativa em primeiro plano. -->
 {% if perms.rastreamento.view_dispositivogps %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
