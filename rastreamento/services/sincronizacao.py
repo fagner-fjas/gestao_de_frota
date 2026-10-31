@@ -1,9 +1,3 @@
-"""Importa dispositivos visíveis no Traccar, sem alterar o Traccar.
-
-O Traccar fornece IDs e uniqueIds; o Django guarda dados administrativos.
-A atualização não modifica vínculos nem reativa equipamentos desativados.
-"""
-
 from django.db import IntegrityError, transaction
 
 from .client import TraccarResponseError
@@ -12,11 +6,10 @@ from rastreamento.models import DispositivoGPS
 
 
 class SincronizacaoGPSInvalida(Exception):
-    """Snapshot inconsistente ou conflito de identidade no banco local."""
+    """"""
 
 
 def _normalizar(dispositivos):
-    """Valida a resposta integralmente antes de tocar no banco de dados."""
     resultado = []
     ids = set()
     identificadores = set()
