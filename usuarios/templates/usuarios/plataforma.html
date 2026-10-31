@@ -61,23 +61,6 @@
     </div>
   </div>
 
-  <div class="cartao col-span-12 xl:col-span-4">
-    <h3 class="mb-4 text-lg font-semibold text-gray-800">CNH vencida ou a vencer</h3>
-    <p class="-mt-3 mb-4 text-xs text-gray-500">Motoristas ativos, próximos 30 dias.</p>
-    <ul class="divide-y divide-gray-100">
-      {% for m in cnh_atencao %}
-        <li class="flex items-center justify-between gap-3 py-3">
-          <a href="{% url 'motorista_detalhe' m.pk %}" class="text-sm font-medium text-gray-700 hover:text-brand-500">{{ m.nome }}</a>
-          {% if m.cnh_validade < hoje %}
-            <span class="rounded-full bg-error-50 px-2.5 py-0.5 text-xs font-medium text-error-600">Vencida {{ m.cnh_validade|date:"d/m/Y" }}</span>
-          {% else %}
-            <span class="rounded-full bg-warning-50 px-2.5 py-0.5 text-xs font-medium text-warning-600">Vence {{ m.cnh_validade|date:"d/m/Y" }}</span>
-          {% endif %}
-        </li>
-      {% empty %}
-        <li class="py-6 text-center text-sm text-gray-500">Nenhuma CNH em atenção.</li>
-      {% endfor %}
-    </ul>
-  </div>
+
 </div>
 {% endblock %}
