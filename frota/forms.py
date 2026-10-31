@@ -52,7 +52,12 @@ class MotoristaForm(forms.ModelForm):
 class VeiculoForm(forms.ModelForm):
     class Meta:
         model = Veiculo
-        fields = '__all__'
+        # O campo legado traccar_device_id é mantido exclusivamente pelo
+        # serviço de associações até a migração do mapa (Entrega 4).
+        fields = [
+            'placa', 'marca', 'modelo', 'ano', 'tipo', 'capacidade',
+            'quilometragem', 'situacao',
+        ]
 
     def clean_placa(self):
         placa = self.cleaned_data['placa'].upper().replace('-', '').strip()

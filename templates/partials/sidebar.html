@@ -55,6 +55,25 @@
 
       </li>
     </ul>
+    {% if perms.rastreamento.view_dispositivogps or perms.frota.view_veiculo %}
+    <h3 class="mb-4 mt-8 text-xs leading-5 text-gray-400 uppercase">Gerenciamento de GPS</h3>
+    <ul class="flex flex-col gap-1">
+      {% if perms.rastreamento.view_dispositivogps %}
+      <li>
+        <a href="{% url 'gps_dispositivos' %}" class="menu-item group {% if '/gps/' in caminho %}menu-item-active{% else %}menu-item-inactive{% endif %}">
+          Dispositivos GPS
+        </a>
+      </li>
+      {% endif %}
+      {% if perms.frota.view_veiculo %}
+      <li>
+        <a href="{% url 'rastreamento' %}" class="menu-item group {% if '/rastreamento/' in caminho %}menu-item-active{% else %}menu-item-inactive{% endif %}">
+          Mapa da Frota
+        </a>
+      </li>
+      {% endif %}
+    </ul>
+    {% endif %}
   </nav>
 </aside>
 {% endwith %}

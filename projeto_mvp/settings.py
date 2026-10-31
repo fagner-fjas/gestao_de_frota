@@ -18,6 +18,7 @@ INSTALLED_APPS = [
     'django_tailwind_cli',
     'usuarios',
     'frota',
+    'rastreamento.apps.RastreamentoConfig',
 ]
 
 MIDDLEWARE = [
