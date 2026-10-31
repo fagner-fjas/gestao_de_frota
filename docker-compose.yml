@@ -16,6 +16,16 @@ services:
       timeout: 5s
       retries: 30
       start_period: 120s
+      
+  traccar:
+    image: traccar/traccar:6.16.0
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8082:8082"
+      - "192.168.1.227:5055:5055"
+    volumes:
+      - traccar_data:/opt/traccar/data
+      - traccar_logs:/opt/traccar/logs
 
   web:
     build: .
@@ -44,3 +54,5 @@ services:
 
 volumes:
   mysql_data:
+  traccar_data:
+  traccar_logs:

@@ -68,6 +68,13 @@ class Veiculo(models.Model):
         ONIBUS = 'ONIBUS', 'Ônibus'
         CAMINHAO = 'CAMINHAO', 'Caminhão'
 
+    traccar_device_id = models.PositiveIntegerField(
+        "ID do dispositivo Traccar",
+        null=True,
+        blank=True,
+        unique=True,
+        )
+
     class Situacao(models.TextChoices):
         DISPONIVEL = 'DISPONIVEL', 'Disponível'
         EM_VIAGEM = 'EM_VIAGEM', 'Em viagem'

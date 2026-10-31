@@ -70,6 +70,15 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
+TRACCAR_URL = os.environ.get(
+    "TRACCAR_URL",
+    "http://traccar:8082"
+)
+
+TRACCAR_API_TOKEN = os.environ.get(
+    "TRACCAR_API_TOKEN", ""
+)
+
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Fortaleza'
 USE_I18N = True
