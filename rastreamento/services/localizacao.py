@@ -1,12 +1,9 @@
-"""Consulta das últimas posições disponíveis, sem persistência no Django."""
-
 from math import isfinite
 
 from .client import TraccarResponseError, traccar_get_collection
 
 
 def ultimas_posicoes():
-    """Últimas posições conhecidas (não necessariamente atuais)."""
     posicoes = traccar_get_collection(
         '/api/positions', ('deviceId', 'latitude', 'longitude')
     )
