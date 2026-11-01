@@ -1,10 +1,7 @@
-"""Consultas de dispositivos no Traccar (somente leitura, MVP)."""
-
 from .client import TraccarResponseError, traccar_get_collection
 
 
 def listar_dispositivos():
-    """Dispositivos visíveis para o token da integração."""
     dispositivos = traccar_get_collection('/api/devices', ('id', 'name'))
     for dispositivo in dispositivos:
         identificador = dispositivo['id']
