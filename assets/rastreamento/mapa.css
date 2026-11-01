@@ -1,0 +1,17 @@
+/* Entrega 4: CSS escopado do mapa; não altera estilos dos demais CRUDs. */
+#gps-mapa {height: min(66vh, 650px);min-height: 390px;width: 100%;border-radius: 10px;z-index: 0;background:#e9eef1;}
+.gps-mapa-cartao { min-width: 0; }
+.gps-lista { max-height: 650px; overflow-y: auto; display: flex; flex-direction: column; gap: 9px; }
+.gps-item { border: 1px solid #e5e7eb; border-radius: 9px; padding: 11px; text-align: left; width: 100%;background: #fff;cursor: pointer; }
+.gps-item:hover, .gps-item:focus-visible { border-color: #6366f1; outline-offset: 2px; }
+.gps-item:disabled {cursor: default; opacity:.8;}
+.gps-item-titulo {display:block;font-weight:600;color:#1f2937;font-size:13px;}
+.gps-item-sub {display:block;color:#6b7280;font-size:12px;margin-top:3px;}
+.gps-badge {display:inline-block;margin-top:6px;border-radius:20px;padding:2px 8px;font-size:11px;font-weight:600;}
+.gps-badge-recente { background:#e3f7ec; color:#166534; }
+.gps-badge-atrasada, .gps-badge-sem_horario {background:#fff3d6;color:#92400e;}
+.gps-badge-desatualizada, .gps-badge-sem_posicao {background:#f3f4f6;color:#4b5563;}
+.gps-alerta {border:1px solid #fca5a5;background:#fff1f2;color:#9f1239;border-radius:9px;padding:12px;margin-bottom:12px;font-size:13px;}
+.gps-alerta[hidden] {display: none;}
+.gps-legenda {color:#4b5563;font-size:12px;}
+@media (max-width: 640px) {#gps-mapa {height: 54vh;min-height: 320px;}}

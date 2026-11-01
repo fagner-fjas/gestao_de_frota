@@ -1,0 +1,24 @@
+{% extends 'base_auth.html' %}
+{% block titulo %}Cadastro{% endblock %}
+{% block subtitulo %}Crie seu usuário{% endblock %}
+{% block conteudo %}
+<form method="post" class="space-y-5">
+  {% csrf_token %}
+  <div>
+    <label for="username" class="rotulo">Usuário</label>
+    <input id="username" type="text" name="username" required autofocus class="campo">
+  </div>
+  <div>
+    <label for="email" class="rotulo">E-mail</label>
+    <input id="email" type="email" name="email" class="campo">
+  </div>
+  <div>
+    <label for="password" class="rotulo">Senha</label>
+    <input id="password" type="password" name="password" required class="campo">
+  </div>
+  <button type="submit" class="botao-primario w-full">Cadastrar</button>
+</form>
+<p class="mt-5 text-center text-sm text-gray-500">
+  <a href="{% url 'login' %}" class="font-medium text-brand-500 hover:text-brand-600">Já tenho conta</a>
+</p>
+{% endblock %}

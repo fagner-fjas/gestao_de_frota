@@ -1,0 +1,13 @@
+<header class="sticky top-0 z-999 flex w-full items-center justify-between border-b border-gray-200 bg-white px-4 py-3 md:px-6">
+  <button type="button" @click.stop="sidebarOpen = !sidebarOpen" aria-label="Abrir menu"
+          class="flex size-10 items-center justify-center rounded-lg border border-gray-200 text-gray-500 xl:hidden">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+  <div class="hidden xl:block"></div>
+
+  <div class="flex items-center gap-3">
+    <span class="flex size-10 items-center justify-center rounded-full bg-brand-50 text-sm font-semibold text-brand-500">{{ user.username|slice:":1"|upper }}</span>
+    <span class="hidden text-sm font-medium text-gray-700 sm:block">{{ user.username }}</span>
+    <a href="{% url 'logout' %}" class="botao-secundario">Sair</a>
+  </div>
+</header>

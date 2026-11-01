@@ -1,0 +1,23 @@
+{% load tailwind_cli %}<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Entrar{% endblock %} · Gestão de Frota</title>
+  {% tailwind_css %}
+</head>
+<body>
+  <div class="flex min-h-screen items-center justify-center p-4">
+    <div class="w-full max-w-md">
+      <div class="mb-6 text-center">
+        <h1 class="text-title-xs font-semibold text-gray-800">Gestão de Frota</h1>
+        <p class="mt-1 text-sm text-gray-500">{% block subtitulo %}{% endblock %}</p>
+      </div>
+      <div class="cartao">
+        {% include 'partials/mensagens.html' %}
+        {% block conteudo %}{% endblock %}
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,95 @@
+"""Configurações do projeto"""
+import os
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'chave-trocar-depois') # Fora de testes locais deve ser uma variável secreta
+DEBUG = os.environ.get('DJANGO_DEBUG', '1') == '1'
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'django_tailwind_cli',
+    'usuarios',
+    'frota',
+    'rastreamento.apps.RastreamentoConfig',
+]
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'projeto_mvp.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates'],  # pasta com o base.html
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+WSGI_APPLICATION = 'projeto_mvp.wsgi.application'
+
+# Banco de dados MySQL ---------------------------------------------------------
+# Ajuste a senha (e o usuário, se não for o root) abaixo ou pelas variáveis de
+# ambiente DB_NAME, DB_USER, DB_PASSWORD, DB_HOST e DB_PORT.
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST', 'db'),
+        'PORT': os.environ.get('DB_PORT', '3306'),
+    }
+}
+
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+]
+
+TRACCAR_URL = os.environ.get(
+    "TRACCAR_URL",
+    "http://traccar:8082"
+)
+
+TRACCAR_API_TOKEN = os.environ.get(
+    "TRACCAR_API_TOKEN", ""
+)
+
+LANGUAGE_CODE = 'pt-br'
+TIME_ZONE = 'America/Fortaleza'
+USE_I18N = True
+USE_TZ = True 
+
+STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR / 'assets'] 
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+TAILWIND_CLI_SRC_CSS = BASE_DIR / 'tailwind' / 'source.css'
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_URL = '/auth/login/'
+

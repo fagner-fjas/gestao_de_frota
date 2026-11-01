@@ -1,0 +1,21 @@
+{% extends 'frota/detalhe.html' %}
+{% block acoes_extras %}
+<div class="mt-6 flex flex-wrap gap-3 border-t border-gray-100 pt-5">
+  {% if object.status == 'AGENDADA' %}
+    <form method="post" action="{% url 'viagem_status' object.pk 'iniciar' %}">
+      {% csrf_token %}<button type="submit" class="botao-primario">Iniciar viagem</button>
+    </form>
+  {% endif %}
+  {% if object.status == 'EM_ANDAMENTO' %}
+    <form method="post" action="{% url 'viagem_status' object.pk 'concluir' %}">
+      {% csrf_token %}<button type="submit" class="botao-sucesso">Concluir viagem</button>
+    </form>
+  {% endif %}
+  {% if object.status == 'AGENDADA' or object.status == 'EM_ANDAMENTO' %}
+    <form method="post" action="{% url 'viagem_status' object.pk 'cancelar' %}"
+          onsubmit="return confirm('Cancelar esta viagem?');">
+      {% csrf_token %}<button type="submit" class="botao-secundario text-error-600">Cancelar viagem</button>
+    </form>
+  {% endif %}
+</div>
+{% endblock %}

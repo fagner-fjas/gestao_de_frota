@@ -1,0 +1,25 @@
+{% load tailwind_cli %}<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Painel{% endblock %} · Gestão de Frota</title>
+  {% tailwind_css %}
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body x-data="{ sidebarOpen: false }">
+  <div class="flex h-screen overflow-hidden">
+    {% include 'partials/sidebar.html' %}
+
+    <div class="relative flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
+      {% include 'partials/header.html' %}
+      <main>
+        <div class="mx-auto max-w-(--breakpoint-2xl) p-4 pb-20 md:p-6">
+          {% include 'partials/mensagens.html' %}
+          {% block conteudo %}{% endblock %}
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>
