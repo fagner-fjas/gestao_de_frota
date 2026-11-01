@@ -8,3 +8,10 @@ __pycache__/
 .env
 db.sqlite3
 .vscode/
+
+.django_tailwind_cli/
+staticfiles/
+assets/css/tailwind.css
+.env.*.local
+*.zip
+*.patch

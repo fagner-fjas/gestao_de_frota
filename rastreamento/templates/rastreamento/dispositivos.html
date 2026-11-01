@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block titulo %}Dispositivos GPS{% endblock %}
+{% block conteudo %}
+<div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+  <div>
+    <h1 class="text-title-xs font-semibold text-gray-800">Dispositivos GPS</h1>
+    <p class="mt-1 text-sm text-gray-500">Cadastros importados do Traccar e associação com veículos da frota.</p>
+  </div>
+  {% if perms.rastreamento.add_dispositivogps %}
+  <form method="post" action="{% url 'gps_importar' %}">
+    {% csrf_token %}
+    <button type="submit" class="botao-primario">Sincronizar com Traccar</button>
+  </form>
+  {% endif %}
+</div>
+
+<div class="cartao">
+  <div class="custom-scrollbar max-w-full overflow-x-auto">
+    <table class="min-w-full">
+      <thead class="border-y border-gray-100">
+        <tr>
+          <th class="px-4 py-3 text-left text-theme-xs text-gray-500">Nome</th>
+          <th class="px-4 py-3 text-left text-theme-xs text-gray-500">ID Traccar</th>
+          <th class="px-4 py-3 text-left text-theme-xs text-gray-500">Identificador do GPS</th>
+          <th class="px-4 py-3 text-left text-theme-xs text-gray-500">Veículo</th>
+          <th class="px-4 py-3 text-left text-theme-xs text-gray-500">Situação administrativa</th>
+          <th class="px-4 py-3 text-right text-theme-xs text-gray-500">Ação</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        {% for gps in dispositivos %}
+        <tr class="hover:bg-gray-50">
+          <td class="px-4 py-3 text-sm text-gray-800">{{ gps.nome }}</td>
+          <td class="px-4 py-3 text-sm text-gray-600">{{ gps.traccar_id }}</td>
+          <td class="px-4 py-3 text-sm text-gray-600">{{ gps.unique_id|default:'Não sincronizado' }}</td>
+          <td class="px-4 py-3 text-sm text-gray-600">{{ gps.veiculo|default:'Sem veículo' }}</td>
+          <td class="px-4 py-3 text-sm text-gray-600">{% if gps.ativo %}Ativo{% else %}Inativo{% endif %}</td>
+          <td class="px-4 py-3 text-right text-sm">
+            {% if perms.rastreamento.change_dispositivogps %}
+            <a class="font-medium text-brand-500 hover:text-brand-600" href="{% url 'gps_associar' gps.pk %}">Associar</a>
+            {% else %}—{% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="px-4 py-10 text-center text-sm text-gray-500">Nenhum GPS importado. Use “Sincronizar com Traccar”, se tiver permissão.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if page_obj.has_other_pages %}
+  <div class="mt-5 flex items-center justify-between text-sm text-gray-500">
+    <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    <div class="flex gap-2">
+      {% if page_obj.has_previous %}<a class="botao-secundario" href="?page={{ page_obj.previous_page_number }}">« Anterior</a>{% endif %}
+      {% if page_obj.has_next %}<a class="botao-secundario" href="?page={{ page_obj.next_page_number }}">Próxima »</a>{% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+<p class="mt-3 text-xs text-gray-500">A situação administrativa não representa o estado online/offline do equipamento. A sincronização não remove dispositivos nem altera vínculos existentes.</p>
+{% endblock %}

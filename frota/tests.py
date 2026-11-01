@@ -31,12 +31,45 @@ class RotaCrudTest(BaseTeste):
         self.client.post(reverse('rota_excluir', args=[rota.pk]))
         self.assertEqual(Rota.objects.count(), 0)
 
+    
     def test_validacoes(self):
-        Rota.objects.create(nome='R1', origem='A', destino='B', distancia_km=10, duracao_minutos=30)
-        r = self.client.post(reverse('rota_nova'), {
-            'nome': 'R1', 'origem': 'A', 'destino': 'B', 'distancia_km': '-5', 'duracao_minutos': 30})
+        Rota.objects.create(
+            nome='R1',
+            origem='A',
+            destino='B',
+            distancia_km=10,
+            duracao_minutos=30
+        )
+
+        resposta = self.client.post(
+            reverse('rota_nova'),
+            {
+                'nome': 'R1',
+                'origem': 'A',
+                'destino': 'B',
+                'distancia_km': '-5',
+                'duracao_minutos': 30
+            }
+        )
+
+        self.assertEqual(resposta.status_code, 200)
         self.assertEqual(Rota.objects.count(), 1)
-        self.assertContains(r, 'errorlist')
+
+        formulario = resposta.context['form']
+
+        self.assertFalse(formulario.is_valid())
+        self.assertIn('nome', formulario.errors)
+        self.assertIn('distancia_km', formulario.errors)
+
+        self.assertContains(
+            resposta,
+            'Rota com este Nome / código já existe.'
+        )
+
+        self.assertContains(
+            resposta,
+            'Certifique-se que este valor seja maior ou igual a 0.1.'
+        )
 
     def test_paginacao(self):
         for i in range(25):

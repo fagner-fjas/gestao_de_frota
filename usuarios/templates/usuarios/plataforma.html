@@ -1,21 +1,155 @@
 {% extends 'base.html' %}
-{% block titulo %}Base{% endblock %}
+{% load static %}
+{% block titulo %}Painel operacional{% endblock %}
 {% block conteudo %}
-<h1>Plataforma</h1>
-<p>Usuário: {{ request.user.username }} </p>
+<div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+  <div>
+    <h1 class="text-title-xs font-semibold text-gray-800">Olá, {{ request.user.username }}</h1>
+    <p class="mt-1 text-sm text-gray-500">Acompanhe os indicadores, organize as próximas viagens e consulte o rastreamento da frota.</p>
+  </div>
+  <a href="{% url 'viagem_nova' %}" class="botao-primario inline-flex items-center justify-center gap-2 self-start">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+    Nova viagem
+  </a>
+</div>
 
-<h2>Cadastros</h2>
-<ul>
-  <li><a href="{% url 'rota_lista' %}">Rotas</a></li>
-  <li><a href="{% url 'motorista_lista' %}">Motoristas</a></li>
-  <li><a href="{% url 'veiculo_lista' %}">Veículos</a></li>
-  <li><a href="{% url 'passageiro_lista' %}">Passageiros</a></li>
-</ul>
+<section aria-label="Indicadores da frota" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 md:gap-6">
+  <div class="cartao">
+    <div class="flex items-center justify-between">
+      <span class="text-sm text-gray-500">Viagens agendadas</span>
+      <span class="inline-flex size-10 items-center justify-center rounded-xl bg-brand-50 text-brand-500" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+      </span>
+    </div>
+    <h2 class="mt-3 text-title-sm font-bold text-gray-800">{{ viagens_agendadas }}</h2>
+    <span class="mt-3 inline-flex rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-medium text-brand-500">{{ viagens_em_andamento }} em andamento</span>
+  </div>
+  <div class="cartao">
+    <div class="flex items-center justify-between">
+      <span class="text-sm text-gray-500">Viagens concluídas</span>
+      <span class="inline-flex size-10 items-center justify-center rounded-xl bg-success-50 text-success-600" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></svg>
+      </span>
+    </div>
+    <h2 class="mt-3 text-title-sm font-bold text-gray-800">{{ viagens_concluidas }}</h2>
+    <span class="mt-3 inline-flex rounded-full bg-success-50 px-2.5 py-0.5 text-xs font-medium text-success-600">Histórico operacional</span>
+  </div>
+  <div class="cartao">
+    <div class="flex items-center justify-between">
+      <span class="text-sm text-gray-500">Veículos disponíveis</span>
+      <span class="inline-flex size-10 items-center justify-center rounded-xl bg-brand-50 text-brand-500" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16V7a1 1 0 0 1 1-1h9v10M13 9h4l3 3v4h-7"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
+      </span>
+    </div>
+    <h2 class="mt-3 text-title-sm font-bold text-gray-800">{{ veiculos_disponiveis }} <span class="text-base font-medium text-gray-400">/ {{ veiculos_total }}</span></h2>
+    <span class="mt-3 inline-flex rounded-full bg-warning-50 px-2.5 py-0.5 text-xs font-medium text-warning-600">{{ veiculos_manutencao }} em manutenção</span>
+  </div>
+  <div class="cartao">
+    <div class="flex items-center justify-between">
+      <span class="text-sm text-gray-500">Motoristas ativos</span>
+      <span class="inline-flex size-10 items-center justify-center rounded-xl bg-brand-50 text-brand-500" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+      </span>
+    </div>
+    <h2 class="mt-3 text-title-sm font-bold text-gray-800">{{ motoristas_ativos }}</h2>
+    <span class="mt-3 inline-flex rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600">{{ cnh_atencao|length }} CNH em atenção</span>
+  </div>
+</section>
 
-<h2>Agendamento</h2>
-<ul>
-  <li><a href="{% url 'viagem_lista' %}">Agendamento de viagens</a></li>
-</ul>
+<section aria-label="Operação da frota" class="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-12 md:gap-6">
+  <div class="cartao min-w-0 xl:col-span-8">
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <h2 class="text-lg font-semibold text-gray-800">Próximas viagens</h2>
+        <p class="mt-1 text-sm text-gray-500">Agendamentos futuros cadastrados no sistema.</p>
+      </div>
+      <a href="{% url 'viagem_lista' %}" class="botao-secundario">Ver todas</a>
+    </div>
+    <div class="custom-scrollbar max-w-full overflow-x-auto">
+      <table class="min-w-full">
+        <thead class="border-y border-gray-100">
+          <tr>
+            <th scope="col" class="px-4 py-3 text-left text-theme-xs font-medium text-gray-500">Partida</th>
+            <th scope="col" class="px-4 py-3 text-left text-theme-xs font-medium text-gray-500">Rota</th>
+            <th scope="col" class="px-4 py-3 text-left text-theme-xs font-medium text-gray-500">Veículo</th>
+            <th scope="col" class="px-4 py-3 text-left text-theme-xs font-medium text-gray-500">Motorista</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          {% for v in proximas_viagens %}
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-3.5 text-theme-sm whitespace-nowrap text-gray-700"><a href="{% url 'viagem_detalhe' v.pk %}" class="font-medium text-brand-500 hover:text-brand-600">{{ v.data_hora_partida|date:"d/m/Y H:i" }}</a></td>
+              <td class="px-4 py-3.5 text-theme-sm text-gray-700">{{ v.rota.nome }}</td>
+              <td class="px-4 py-3.5 text-theme-sm whitespace-nowrap text-gray-700">{{ v.veiculo.placa }}</td>
+              <td class="px-4 py-3.5 text-theme-sm text-gray-700">{{ v.motorista.nome }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="4" class="px-4 py-10 text-center text-sm text-gray-500">Nenhuma viagem agendada. <a href="{% url 'viagem_nova' %}" class="font-medium text-brand-500 hover:text-brand-600">Cadastrar viagem</a></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <aside class="cartao xl:col-span-4" aria-label="Situação e acessos rápidos">
+    <h2 class="text-lg font-semibold text-gray-800">Situação operacional</h2>
+    <p class="mt-1 text-sm text-gray-500">Indicadores para acompanhamento.</p>
+    <div class="mt-4 divide-y divide-gray-100 rounded-xl border border-gray-100 px-4">
+      <div class="flex items-center justify-between gap-3 py-3"><span class="text-sm text-gray-600">Viagens em andamento</span><strong class="text-sm font-semibold text-gray-800">{{ viagens_em_andamento }}</strong></div>
+      <div class="flex items-center justify-between gap-3 py-3"><span class="text-sm text-gray-600">Veículos em manutenção</span><strong class="text-sm font-semibold text-gray-800">{{ veiculos_manutencao }}</strong></div>
+      <div class="flex items-center justify-between gap-3 py-3"><span class="text-sm text-gray-600">CNH próximas do vencimento ou vencidas</span><strong class="text-sm font-semibold text-gray-800">{{ cnh_atencao|length }}</strong></div>
+    </div>
+    <h3 class="mt-5 text-sm font-semibold text-gray-800">Acessos rápidos</h3>
+    <div class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-1">
+      <a href="{% url 'veiculo_nova' %}" class="flex items-center justify-between gap-2 rounded-xl border border-gray-200 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:border-brand-500 hover:text-brand-500">Cadastrar veículo <span aria-hidden="true">↗</span></a>
+      <a href="{% url 'rota_nova' %}" class="flex items-center justify-between gap-2 rounded-xl border border-gray-200 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:border-brand-500 hover:text-brand-500">Cadastrar rota <span aria-hidden="true">↗</span></a>
+      <a href="{% url 'motorista_nova' %}" class="flex items-center justify-between gap-2 rounded-xl border border-gray-200 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:border-brand-500 hover:text-brand-500">Cadastrar motorista <span aria-hidden="true">↗</span></a>
+    </div>
+  </aside>
+</section>
+
+{% if perms.rastreamento.view_dispositivogps %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link rel="stylesheet" href="{% static 'rastreamento/painel.css' %}">
+<section id="resumo-gps" aria-label="Rastreamento da frota" class="mt-6">
+  <div class="cartao">
+    <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h2 class="text-lg font-semibold text-gray-800">Rastreamento GPS</h2>
+        <p class="mt-1 text-sm text-gray-500">Últimas posições conhecidas dos veículos com dispositivos associados.</p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <a href="{% url 'gps_dispositivos' %}" class="botao-secundario">Dispositivos GPS</a>
+        <a href="{% url 'rastreamento' %}" class="botao-primario">Abrir mapa completo</a>
+      </div>
+    </div>
+    <div class="mb-5 grid grid-cols-2 gap-3 xl:grid-cols-4">
+      <div class="rounded-xl border border-gray-100 bg-gray-50 p-4"><p class="text-sm text-gray-500">Monitorados</p><p id="painel-gps-total" class="mt-1 text-title-sm font-semibold text-gray-800">—</p></div>
+      <div class="rounded-xl border border-gray-100 bg-gray-50 p-4"><p class="text-sm text-gray-500">Posição recente</p><p id="painel-gps-recentes" class="mt-1 text-title-sm font-semibold text-gray-800">—</p></div>
+      <div class="rounded-xl border border-gray-100 bg-gray-50 p-4"><p class="text-sm text-gray-500">Posição antiga</p><p id="painel-gps-antigos" class="mt-1 text-title-sm font-semibold text-gray-800">—</p></div>
+      <div class="rounded-xl border border-gray-100 bg-gray-50 p-4"><p class="text-sm text-gray-500">Sem posição</p><p id="painel-gps-sem-posicao" class="mt-1 text-title-sm font-semibold text-gray-800">—</p></div>
+    </div>
+    <div id="painel-gps-widget" class="grid grid-cols-1 gap-4 xl:grid-cols-12" data-url="{% url 'rastreamento_dados' %}" data-intervalo="60000">
+      <div id="painel-gps-alerta" class="painel-gps-alerta xl:col-span-12" role="alert" hidden></div>
+      <div class="min-w-0 xl:col-span-8">
+        <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <h3 class="text-base font-semibold text-gray-800">Mini mapa da frota</h3>
+          <span id="painel-gps-atualizacao" class="text-xs text-gray-500" role="status" aria-live="polite">Carregando posições...</span>
+        </div>
+        <div id="painel-gps-mapa" aria-label="Mapa resumido de veículos rastreados"></div>
+        <p class="mt-2 text-xs text-gray-500">O mapa mostra a última posição registrada, que pode estar desatualizada. Consulta a cada 60 segundos.</p>
+      </div>
+      <aside class="min-w-0 xl:col-span-4">
+        <h3 class="mb-3 text-base font-semibold text-gray-800">Veículos monitorados</h3>
+        <div id="painel-gps-lista" class="painel-gps-lista" aria-live="polite"><p class="text-sm text-gray-500">Carregando veículos...</p></div>
+        <p id="painel-gps-lista-info" class="mt-3 text-xs text-gray-500"></p>
+      </aside>
+    </div>
+  </div>
+</section>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
+<script src="{% static 'rastreamento/painel.js' %}" defer></script>
+{% endif %}
 {% endblock %}
-
-

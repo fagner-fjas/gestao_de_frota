@@ -1,57 +1,76 @@
 {% extends 'base.html' %}
+{% load ui %}
 {% block titulo %}{{ nome_plural|capfirst }}{% endblock %}
 {% block conteudo %}
-<h1>{{ nome_plural|capfirst }}</h1>
-<p><a class="botao" href="{% url url_base|add:'_nova' %}">Novo cadastro</a></p>
+<div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+  <h1 class="text-title-xs font-semibold text-gray-800">{{ nome_plural|capfirst }}</h1>
+  <a href="{% url url_base|add:'_nova' %}" class="botao-primario">+ Novo cadastro</a>
+</div>
 
-<form method="get" class="busca">
-  <input type="text" name="q" value="{{ q }}" placeholder="Buscar...">
-  {% if status_choices %}
-    <select name="status">
-      <option value="">Todos os status</option>
-      {% for valor, rotulo in status_choices %}
-        <option value="{{ valor }}" {% if valor == status %}selected{% endif %}>{{ rotulo }}</option>
-      {% endfor %}
-    </select>
+<div class="cartao">
+  <form method="get" class="mb-5 flex flex-col gap-3 sm:flex-row">
+    <input type="text" name="q" value="{{ q }}" placeholder="Buscar..." class="campo sm:max-w-xs">
+    {% if status_choices %}
+      <select name="status" class="campo sm:max-w-48">
+        <option value="">Todos os status</option>
+        {% for valor, rotulo in status_choices %}
+          <option value="{{ valor }}" {% if valor == status %}selected{% endif %}>{{ rotulo }}</option>
+        {% endfor %}
+      </select>
+    {% endif %}
+    <button type="submit" class="botao-primario">Buscar</button>
+    <a href="{% url url_base|add:'_lista' %}" class="botao-secundario">Limpar</a>
+  </form>
+
+  <div class="custom-scrollbar max-w-full overflow-x-auto">
+    <table class="min-w-full">
+      <thead class="border-y border-gray-100">
+        <tr>
+          <th class="px-4 py-3 text-left text-theme-xs font-medium whitespace-nowrap text-gray-500">ID</th>
+          {% for cabecalho in cabecalhos %}
+            <th class="px-4 py-3 text-left text-theme-xs font-medium whitespace-nowrap text-gray-500">{{ cabecalho }}</th>
+          {% endfor %}
+          <th class="px-4 py-3 text-right text-theme-xs font-medium text-gray-500">Ações</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        {% for obj, valores in linhas %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-4 py-3.5 text-theme-sm text-gray-500">{{ obj.pk }}</td>
+            {% for valor in valores %}
+              <td class="px-4 py-3.5 text-theme-sm text-gray-700">
+                {% with classes=valor|badge %}
+                  {% if classes %}
+                    <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium {{ classes }}">{{ valor }}</span>
+                  {% else %}{{ valor }}{% endif %}
+                {% endwith %}
+              </td>
+            {% endfor %}
+            <td class="px-4 py-3.5 text-right text-theme-sm whitespace-nowrap">
+              <a href="{% url url_base|add:'_detalhe' obj.pk %}" class="font-medium text-gray-600 hover:text-brand-500">Ver</a>
+              <a href="{% url url_base|add:'_editar' obj.pk %}" class="ml-3 font-medium text-brand-500 hover:text-brand-600">Editar</a>
+              <a href="{% url url_base|add:'_excluir' obj.pk %}" class="ml-3 font-medium text-error-500 hover:text-error-600">Excluir</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="{{ cabecalhos|length|add:2 }}" class="px-4 py-10 text-center text-sm text-gray-500">Nenhum registro encontrado.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if is_paginated %}
+    <div class="mt-5 flex items-center justify-between text-sm text-gray-500">
+      <span>Página {{ page_obj.number }} de {{ paginator.num_pages }}</span>
+      <div class="flex gap-2">
+        {% if page_obj.has_previous %}
+          <a class="botao-secundario" href="?page={{ page_obj.previous_page_number }}&q={{ q|urlencode }}&status={{ status|urlencode }}">« Anterior</a>
+        {% endif %}
+        {% if page_obj.has_next %}
+          <a class="botao-secundario" href="?page={{ page_obj.next_page_number }}&q={{ q|urlencode }}&status={{ status|urlencode }}">Próxima »</a>
+        {% endif %}
+      </div>
+    </div>
   {% endif %}
-  <button type="submit">Buscar</button>
-  <a href="{% url url_base|add:'_lista' %}">Limpar</a>
-</form>
-
-<table>
-  <thead>
-    <tr>
-      <th>ID</th>
-      {% for cabecalho in cabecalhos %}<th>{{ cabecalho }}</th>{% endfor %}
-      <th>Ações</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for obj, valores in linhas %}
-      <tr>
-        <td>{{ obj.pk }}</td>
-        {% for valor in valores %}<td>{{ valor }}</td>{% endfor %}
-        <td>
-          <a href="{% url url_base|add:'_detalhe' obj.pk %}">Ver</a> |
-          <a href="{% url url_base|add:'_editar' obj.pk %}">Editar</a> |
-          <a href="{% url url_base|add:'_excluir' obj.pk %}">Excluir</a>
-        </td>
-      </tr>
-    {% empty %}
-      <tr><td colspan="{{ cabecalhos|length|add:2 }}">Nenhum registro encontrado.</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
-
-{% if is_paginated %}
-  <p>
-    Página {{ page_obj.number }} de {{ paginator.num_pages }}
-    {% if page_obj.has_previous %}
-      <a href="?page={{ page_obj.previous_page_number }}&q={{ q|urlencode }}&status={{ status|urlencode }}">« Anterior</a>
-    {% endif %}
-    {% if page_obj.has_next %}
-      <a href="?page={{ page_obj.next_page_number }}&q={{ q|urlencode }}&status={{ status|urlencode }}">Próxima »</a>
-    {% endif %}
-  </p>
-{% endif %}
+</div>
 {% endblock %}

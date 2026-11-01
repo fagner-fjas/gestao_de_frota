@@ -15,8 +15,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_tailwind_cli',
     'usuarios',
     'frota',
+    'rastreamento.apps.RastreamentoConfig',
 ]
 
 MIDDLEWARE = [
@@ -69,12 +71,25 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
+TRACCAR_URL = os.environ.get(
+    "TRACCAR_URL",
+    "http://traccar:8082"
+)
+
+TRACCAR_API_TOKEN = os.environ.get(
+    "TRACCAR_API_TOKEN", ""
+)
+
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Fortaleza'
 USE_I18N = True
 USE_TZ = True 
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR / 'assets'] 
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+TAILWIND_CLI_SRC_CSS = BASE_DIR / 'tailwind' / 'source.css'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = '/auth/login/'
+

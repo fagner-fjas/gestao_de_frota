@@ -1,54 +1,36 @@
 
 
-
-
----
-
-## Rodar com Docker
-
-
-### 1. Pré-requisitos
-
-- [Docker](https://docs.docker.com/engine/install/) e Docker Compose v
-
-Teste com:
-
-```bash
-docker --version
-docker compose version
-```
-
-### 2. Clonar o projeto
-
 ```bash
 git clone https://github.com/fagner-fjas/gestao_de_frota.git
 cd gestao_de_frota
 ```
 
-### 3. Criar o arquivo `.env`
 
-Criar .env e compor por: 
-
-Conteúdo esperado:
-
-```
-DJANGO_SECRET_KEY=troque-por-uma-chave
-DJANGO_DEBUG=1
-DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
-
-DB_NAME=frota_mvp
-DB_USER=frota_user
-DB_PASSWORD=troque-essa-senha
-DB_ROOT_PASSWORD=troque-essa-senha-root
-DB_HOST=db
-DB_PORT=3306
-```
-
-
-### 4. Subir os containers
 
 ```bash
-docker compose up --build
+cp .env.example .env
 ```
+
+substitua DJANGO_SECRET_KEY por uma senha de 50 digitos
+
+```bash
+docker compose up -d --build
+```
+
+
+### Criar administrador Django
+
+```bash
+docker compose exec web python manage.py createsuperuser
+```
+
+
+- **Aplicação:** <http://localhost:8000/auth/login/>
+- **Painel:** <http://localhost:8000/auth/plataforma/>
+- **Admin Django:** <http://localhost:8000/admin/>
+- **Traccar:** <http://localhost:8082/>
+
+
+
 
 

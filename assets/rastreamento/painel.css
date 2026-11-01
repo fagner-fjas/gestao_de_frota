@@ -1,0 +1,61 @@
+/* Entrega 6 — estilos apenas para o widget GPS do dashboard. */
+#painel-gps-mapa {
+  height: 360px;
+  min-height: 300px;
+  width: 100%;
+  border-radius: 12px;
+  background: #e9eef1;
+  z-index: 0;
+}
+.painel-gps-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 360px;
+  overflow-y: auto;
+}
+.painel-gps-item {
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 12px;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+}
+.painel-gps-item:hover, .painel-gps-item:focus-visible {
+  border-color: #6366f1;
+  outline-offset: 2px;
+}
+.painel-gps-item:disabled { cursor: default; opacity: .85; }
+.painel-gps-item-topo {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.painel-gps-item-topo strong { font-size: 13px; color: #1f2937; }
+.painel-gps-item-detalhe { display: block; margin-top: 4px; font-size: 12px; color: #6b7280; }
+.painel-gps-badge {
+  display: inline-block;
+  border-radius: 20px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.painel-gps-badge-recente { background: #e3f7ec; color: #166534; }
+.painel-gps-badge-atrasada, .painel-gps-badge-sem_horario { background: #fff3d6; color: #92400e; }
+.painel-gps-badge-desatualizada, .painel-gps-badge-sem_posicao { background: #f3f4f6; color: #4b5563; }
+.painel-gps-alerta {
+  border: 1px solid #fca5a5;
+  background: #fff1f2;
+  color: #9f1239;
+  border-radius: 9px;
+  padding: 12px;
+  font-size: 13px;
+}
+.painel-gps-alerta[hidden] { display: none; }
+@media (max-width: 640px) {
+  #painel-gps-mapa { height: 300px; }
+}

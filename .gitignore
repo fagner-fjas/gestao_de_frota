@@ -10,3 +10,9 @@ db.sqlite3
 .idea/
 .vscode/
 .DS_Store
+
+assets/css/tailwind.css
+staticfiles/
+.django_tailwind_cli/
+.env.*.local
+*.zip
