@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block titulo %}Viagens recorrentes{% endblock %}
+{% block conteudo %}
+<div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+  <h1 class="text-title-xs font-semibold text-gray-800">Programações recorrentes</h1>
+  <a class="botao-primario" href="{% url 'programacao_nova' %}">+ Nova programação</a>
+</div>
+<div class="cartao overflow-x-auto">
+  <table class="min-w-full text-left text-sm">
+    <thead><tr class="border-b border-gray-200 text-gray-500"><th class="p-3">Nome</th><th class="p-3">Rota</th><th class="p-3">Horário</th><th class="p-3">Ativa</th><th class="p-3">Acesso</th></tr></thead>
+    <tbody>
+    {% for prog in object_list %}
+      <tr class="border-b border-gray-100"><td class="p-3">{{ prog.nome }}</td><td class="p-3">{{ prog.rota.nome }}</td><td class="p-3">{{ prog.hora_partida|time:'H:i' }}</td><td class="p-3">{{ prog.ativa|yesno:'Sim,Não' }}</td><td class="p-3"><a class="text-brand-600 underline" href="{% url 'programacao_detalhe' prog.pk %}">Detalhes</a></td></tr>
+    {% empty %}
+      <tr><td class="p-3 text-gray-500" colspan="5">Nenhuma programação criada.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% if is_paginated %}<div class="mt-4 text-sm text-gray-600">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }} · {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}">Anterior</a>{% endif %} {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">Próxima</a>{% endif %}</div>{% endif %}
+{% endblock %}

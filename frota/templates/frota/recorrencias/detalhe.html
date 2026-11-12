@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block titulo %}{{ object.nome }}{% endblock %}
+{% block conteudo %}
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3"><h1 class="text-title-xs font-semibold text-gray-800">{{ object.nome }}</h1><a class="botao-secundario" href="{% url 'programacao_editar' object.pk %}">Editar programação</a></div>
+<div class="cartao mb-6">
+  <dl class="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
+    <div><dt class="text-gray-500">Rota</dt><dd>{{ object.rota }}</dd></div>
+    <div><dt class="text-gray-500">Saída</dt><dd>{{ object.hora_partida|time:'H:i' }}</dd></div>
+    <div><dt class="text-gray-500">Dias (segunda=0)</dt><dd>{{ object.dias_semana }}</dd></div>
+    <div><dt class="text-gray-500">Vigência</dt><dd>{{ object.data_inicio|date:'d/m/Y' }} até {{ object.data_fim|date:'d/m/Y'|default:'sem prazo' }}</dd></div>
+    <div><dt class="text-gray-500">Motorista padrão</dt><dd>{{ object.motorista_padrao }}</dd></div>
+    <div><dt class="text-gray-500">Veículo padrão</dt><dd>{{ object.veiculo_padrao }}</dd></div>
+    <div><dt class="text-gray-500">Passageiros vinculados</dt><dd>{{ object.passageiros.count }}</dd></div>
+    <div><dt class="text-gray-500">Status</dt><dd>{{ object.ativa|yesno:'Ativa,Inativa' }}</dd></div>
+  </dl>
+</div>
+<form method="post" action="{% url 'programacao_gerar' object.pk %}" class="cartao mb-6">
+  {% csrf_token %}
+  <h2 class="mb-2 font-semibold text-gray-800">Gerar viagens por período</h2>
+  <p class="mb-4 text-sm text-gray-600">Até 31 dias por execução. Não gera em datas passadas ou fora da vigência. Viagens existentes são preservadas.</p>
+  <div class="flex flex-wrap items-end gap-4"><label class="text-sm">Início<input class="campo mt-2" type="date" name="inicio" value="{{ inicio_padrao|date:'Y-m-d' }}" required></label><label class="text-sm">Fim<input class="campo mt-2" type="date" name="fim" value="{{ fim_padrao|date:'Y-m-d' }}" required></label><button class="botao-primario" type="submit" {% if not object.ativa %}disabled{% endif %}>Gerar ocorrências</button></div>
+</form>
+<div class="cartao overflow-x-auto">
+  <h2 class="mb-4 font-semibold">Últimas 30 viagens geradas</h2>
+  <table class="min-w-full text-left text-sm"><thead><tr class="border-b"><th class="p-2">Data</th><th class="p-2">Status</th><th class="p-2">Veículo</th><th class="p-2">Motorista</th><th class="p-2">Ação</th></tr></thead>
+  <tbody>{% for viagem in viagens %}<tr class="border-b border-gray-100"><td class="p-2">{{ viagem.data_programada|date:'d/m/Y' }}</td><td class="p-2">{{ viagem.get_status_display }}</td><td class="p-2">{{ viagem.veiculo.placa }}</td><td class="p-2">{{ viagem.motorista.nome }}</td><td class="p-2"><a class="text-brand-600 underline" href="{% url 'viagem_detalhe' viagem.pk %}">Abrir</a></td></tr>{% empty %}<tr><td colspan="5" class="p-3 text-gray-500">Nenhuma viagem gerada.</td></tr>{% endfor %}</tbody></table>
+</div>
+{% endblock %}

@@ -5,7 +5,8 @@ from django import forms
 from django.db.models import Q
 from django.utils import timezone
 
-from .models import Motorista, Passageiro, Rota, Veiculo, Viagem
+from .models import Motorista, Passageiro, ProgramacaoRecorrente, Rota, Veiculo, Viagem
+from .services.agenda import conflitos_de_agenda
 
 
 def campo_data():
@@ -114,6 +115,11 @@ class ViagemForm(forms.ModelForm):
         passageiros = dados.get('passageiros')
 
         mudou_data = not self.instance.pk or 'data_hora_partida' in self.changed_data
+        if (partida and self.instance.programacao_recorrente_id
+                and self.instance.data_programada
+                and timezone.localtime(partida).date() != self.instance.data_programada):
+            self.add_error('data_hora_partida', 'A data de uma viagem recorrente não pode ser alterada.')
+
         if partida and mudou_data and partida < timezone.now():
             self.add_error('data_hora_partida', 'A data e hora de partida não podem estar no passado.')
 
@@ -133,39 +139,119 @@ class ViagemForm(forms.ModelForm):
         return dados
 
     def verificar_conflitos(self, partida, rota, veiculo, motorista, passageiros):
-        fim = partida + timedelta(minutes=rota.duracao_minutos)
+        for campo, mensagem in conflitos_de_agenda(
+            partida, rota, veiculo, motorista, passageiros, excluir_id=self.instance.pk
+        ):
+            self.add_error(campo, mensagem)
 
-        filtro = Q()
-        if veiculo:
-            filtro |= Q(veiculo=veiculo)
-        if motorista:
-            filtro |= Q(motorista=motorista)
-        if passageiros:
-            filtro |= Q(passageiros__in=passageiros)
-        if not filtro:
-            return
 
-        outras = Viagem.objects.filter(
-            status__in=[Viagem.Status.AGENDADA, Viagem.Status.EM_ANDAMENTO]
-        ).select_related('rota').prefetch_related('passageiros')
+DIAS_SEMANA = [
+    ('0', 'Segunda-feira'), ('1', 'Terça-feira'), ('2', 'Quarta-feira'),
+    ('3', 'Quinta-feira'), ('4', 'Sexta-feira'), ('5', 'Sábado'), ('6', 'Domingo'),
+]
+
+
+class ProgramacaoRecorrenteForm(forms.ModelForm):
+    dias_semana = forms.MultipleChoiceField(
+        choices=DIAS_SEMANA, widget=forms.CheckboxSelectMultiple,
+        label='Dias da semana',
+    )
+
+    class Meta:
+        model = ProgramacaoRecorrente
+        fields = [
+            'nome', 'rota', 'dias_semana', 'hora_partida', 'data_inicio',
+            'data_fim', 'motorista_padrao', 'veiculo_padrao', 'passageiros', 'ativa',
+        ]
+        widgets = {
+            'data_inicio': campo_data(),
+            'data_fim': campo_data(),
+            'hora_partida': forms.TimeInput(format='%H:%M', attrs={'type': 'time'}),
+            'passageiros': forms.CheckboxSelectMultiple,
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['hora_partida'].input_formats = ['%H:%M']
         if self.instance.pk:
-            outras = outras.exclude(pk=self.instance.pk)
+            self.initial['dias_semana'] = self.instance.dias_semana.split(',')
+        else:
+            self.initial['dias_semana'] = ['0', '1', '2', '3', '4']
+        self.fields['rota'].queryset = Rota.objects.filter(
+            Q(ativa=True) | Q(pk=self.instance.rota_id)
+        )
+        self.fields['motorista_padrao'].queryset = Motorista.objects.filter(
+            Q(ativo=True) | Q(pk=self.instance.motorista_padrao_id)
+        )
+        self.fields['veiculo_padrao'].queryset = Veiculo.objects.filter(
+            Q(situacao=Veiculo.Situacao.DISPONIVEL) | Q(pk=self.instance.veiculo_padrao_id)
+        )
+        self.fields['passageiros'].queryset = Passageiro.objects.filter(
+            Q(ativo=True) | Q(programacaorecorrente=self.instance)
+        ).distinct() if self.instance.pk else Passageiro.objects.filter(ativo=True)
+        self.fields['passageiros'].required = True
 
-        ids_selecionados = {p.pk for p in passageiros or []}
-        for outra in outras.filter(filtro).distinct():
-            outra_fim = outra.data_hora_partida + timedelta(minutes=outra.rota.duracao_minutos)
-            if not (partida < outra_fim and outra.data_hora_partida < fim):
-                continue  
+    def clean_dias_semana(self):
+        dias = self.cleaned_data['dias_semana']
+        return ','.join(sorted(dias))
 
-            referencia = f'viagem #{outra.pk} ({outra})'
-            if veiculo and outra.veiculo_id == veiculo.pk:
-                self.add_error('veiculo', f'Veículo já alocado na {referencia}.')
-            if motorista and outra.motorista_id == motorista.pk:
-                self.add_error('motorista', f'Motorista já alocado na {referencia}.')
-            em_conflito = [p.nome for p in outra.passageiros.all() if p.pk in ids_selecionados]
-            if em_conflito:
-                self.add_error(
-                    'passageiros',
-                    f'Passageiro(s) já em outra viagem no mesmo período: '
-                    f'{", ".join(em_conflito)} ({referencia}).',
-                )
+    def clean(self):
+        dados = super().clean()
+        veiculo = dados.get('veiculo_padrao')
+        passageiros = dados.get('passageiros')
+        motorista = dados.get('motorista_padrao')
+        inicio = dados.get('data_inicio')
+        fim = dados.get('data_fim')
+        if veiculo and passageiros and len(passageiros) > veiculo.capacidade:
+            self.add_error('passageiros', 'Passageiros acima da capacidade do veículo padrão.')
+        if motorista and inicio and motorista.cnh_validade < inicio:
+            self.add_error('motorista_padrao', 'CNH vencida na data de início.')
+        if inicio and fim and fim < inicio:
+            self.add_error('data_fim', 'A data final não pode ser anterior à inicial.')
+        return dados
+
+
+class ConfirmacaoEmbarqueForm(forms.Form):
+    motorista = forms.ModelChoiceField(queryset=Motorista.objects.none())
+    veiculo = forms.ModelChoiceField(queryset=Veiculo.objects.none(), label='Veículo utilizado')
+    passageiros_embarcados = forms.IntegerField(min_value=0, label='Passageiros embarcados')
+
+    def __init__(self, *args, viagem, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.viagem = viagem
+        self.fields['motorista'].queryset = Motorista.objects.filter(
+            Q(ativo=True) | Q(pk=viagem.motorista_id)
+        )
+        self.fields['veiculo'].queryset = Veiculo.objects.filter(
+            Q(situacao=Veiculo.Situacao.DISPONIVEL) | Q(pk=viagem.veiculo_id)
+        )
+        self.initial.update({
+            'motorista': viagem.motorista_id,
+            'veiculo': viagem.veiculo_id,
+            'passageiros_embarcados': viagem.passageiros.count(),
+        })
+
+    def clean(self):
+        dados = super().clean()
+        motorista = dados.get('motorista')
+        veiculo = dados.get('veiculo')
+        total = dados.get('passageiros_embarcados')
+        partida = self.viagem.data_hora_partida
+        if total is not None and veiculo and total > veiculo.capacidade:
+            self.add_error('passageiros_embarcados', 'A contagem excede a capacidade do veículo.')
+        if motorista and not motorista.ativo:
+            self.add_error('motorista', 'Motorista inativo.')
+        if veiculo and veiculo.situacao != Veiculo.Situacao.DISPONIVEL:
+            self.add_error('veiculo', 'Veículo indisponível para confirmação.')
+        if motorista and motorista.cnh_validade < timezone.localtime(partida).date():
+            self.add_error('motorista', 'CNH vencida para esta viagem.')
+        if motorista and veiculo:
+            for campo, mensagem in conflitos_de_agenda(
+                partida, self.viagem.rota, veiculo, motorista,
+                self.viagem.passageiros.all(), excluir_id=self.viagem.pk,
+            ):
+                if campo in ('motorista', 'veiculo'):
+                    self.add_error(campo, mensagem)
+                else:
+                    self.add_error(None, mensagem)
+        return dados
