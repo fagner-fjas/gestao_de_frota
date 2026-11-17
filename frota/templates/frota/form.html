@@ -23,9 +23,17 @@
         {% else %}
           <label for="{{ campo.id_for_label }}" class="rotulo">{{ campo.label }}</label>
           {% if campo.field.widget.allow_multiple_selected and campo.field.widget.input_type == 'checkbox' %}
+<<<<<<< HEAD
             <div class="space-y-2 rounded-lg border border-gray-200 p-3 text-sm text-gray-700 [&_input]:size-4 [&_input]:rounded [&_label]:flex [&_label]:items-center [&_label]:gap-2">
               {{ campo }}
             </div>
+=======
+            {% if campo.name == 'passageiros' %}<div data-seletor-passageiros class="rounded-xl border border-gray-200 p-4">
+              <label for="buscar-passageiro-viagem" class="rotulo">Buscar passageiros</label><input id="buscar-passageiro-viagem" type="search" data-busca-passageiros class="campo mb-3" placeholder="Digite parte do nome">
+              <div class="mb-3 flex flex-wrap items-center gap-2"><button type="button" data-marcar-visiveis class="botao-secundario">Selecionar resultados visíveis</button><button type="button" data-limpar-passageiros class="botao-secundario">Limpar seleção</button><span data-contador-passageiros aria-live="polite" class="text-sm text-gray-600"></span></div>
+              <div class="max-h-64 space-y-2 overflow-y-auto text-sm text-gray-700 [&_input]:size-4 [&_label]:flex [&_label]:items-center [&_label]:gap-2">{{ campo }}</div>
+            </div>{% else %}<div class="space-y-2 rounded-lg border border-gray-200 p-3 text-sm text-gray-700 [&_input]:size-4 [&_label]:flex [&_label]:items-center [&_label]:gap-2">{{ campo }}</div>{% endif %}
+>>>>>>> paineis
           {% else %}
             {{ campo|estilizar }}
           {% endif %}
@@ -42,4 +50,35 @@
     <a href="{% url url_base|add:'_lista' %}" class="botao-secundario">Cancelar</a>
   </div>
 </form>
+<<<<<<< HEAD
+=======
+<script>
+// Aprimoramento progressivo: checkbox nativo permanece disponível sem JavaScript.
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('[data-seletor-passageiros]').forEach((container) => {
+    const busca = container.querySelector('[data-busca-passageiros]');
+    const contador = container.querySelector('[data-contador-passageiros]');
+    const marcar = container.querySelector('[data-marcar-visiveis]');
+    const limpar = container.querySelector('[data-limpar-passageiros]');
+    const checkboxes = [...container.querySelectorAll('input[type="checkbox"]')];
+    function atualizar() {
+      const termo = (busca.value || '').trim().toLocaleLowerCase('pt-BR');
+      for (const cb of checkboxes) {
+        const rotulo = cb.closest('label') || cb.parentElement;
+        if (!rotulo) continue;
+        rotulo.hidden = !!termo && !rotulo.textContent.toLocaleLowerCase('pt-BR').includes(termo);
+        rotulo.style.display = rotulo.hidden ? 'none' : '';
+      }
+      const selecionados = checkboxes.filter(cb => cb.checked).length;
+      contador.textContent = selecionados + ' passageiro(s) selecionado(s)';
+    }
+    busca.addEventListener('input', atualizar);
+    container.addEventListener('change', atualizar);
+    marcar.addEventListener('click', () => {for(const cb of checkboxes) if (!(cb.closest('label')||cb.parentElement).hidden) cb.checked=true; atualizar();});
+    limpar.addEventListener('click', () => {for(const cb of checkboxes) cb.checked=false; atualizar();});
+    atualizar();
+  });
+});
+</script>
+>>>>>>> paineis
 {% endblock %}

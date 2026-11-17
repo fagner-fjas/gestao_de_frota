@@ -1,7 +1,21 @@
 from django.urls import path
+<<<<<<< HEAD
 from . import views
 
 urlpatterns = [
+=======
+from . import views, views_recorrencias
+
+urlpatterns = [
+    # Programações recorrentes — antes das URLs numéricas de viagens
+    path('viagens/recorrencias/', views_recorrencias.ProgramacaoLista.as_view(), name='programacao_lista'),
+    path('viagens/recorrencias/nova/', views_recorrencias.ProgramacaoCriar.as_view(), name='programacao_nova'),
+    path('viagens/recorrencias/<int:pk>/', views_recorrencias.ProgramacaoDetalhe.as_view(), name='programacao_detalhe'),
+    path('viagens/recorrencias/<int:pk>/editar/', views_recorrencias.ProgramacaoEditar.as_view(), name='programacao_editar'),
+    path('viagens/recorrencias/<int:pk>/gerar/', views_recorrencias.programacao_gerar, name='programacao_gerar'),
+    path('viagens/<int:pk>/confirmar/', views_recorrencias.confirmar_viagem, name='viagem_confirmar_recorrente'),
+
+>>>>>>> paineis
     # Rotas
     path('rotas/', views.RotaLista.as_view(), name='rota_lista'),
     path('rotas/nova/', views.RotaCriar.as_view(), name='rota_nova'),

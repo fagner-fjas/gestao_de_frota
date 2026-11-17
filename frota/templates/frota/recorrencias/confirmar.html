@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load ui %}
+{% block titulo %}Confirmação de viagem{% endblock %}
+{% block conteudo %}
+<h1 class="mb-6 text-title-xs font-semibold text-gray-800">Confirmar viagem #{{ viagem.pk }}</h1>
+<p class="mb-5 text-sm text-gray-600">Confirme o veículo e o motorista utilizados e a quantidade de passageiros embarcados. O registro ficará associado ao seu usuário.</p>
+<form method="post" class="cartao max-w-2xl">{% csrf_token %}
+  {% if form.non_field_errors %}<div class="mb-4 text-error-600">{{ form.non_field_errors }}</div>{% endif %}
+  <div class="space-y-5">{% for campo in form %}<div><label class="rotulo" for="{{ campo.id_for_label }}">{{ campo.label }}</label>{{ campo|estilizar }}{% for erro in campo.errors %}<p class="text-sm text-error-600">{{ erro }}</p>{% endfor %}</div>{% endfor %}</div>
+  <div class="mt-6 flex gap-3"><button class="botao-primario" type="submit">Confirmar recursos e embarque</button><a class="botao-secundario" href="{% url 'viagem_detalhe' viagem.pk %}">Cancelar</a></div>
+</form>
+{% endblock %}

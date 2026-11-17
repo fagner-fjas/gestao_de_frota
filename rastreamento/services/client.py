@@ -1,3 +1,12 @@
+<<<<<<< HEAD
+=======
+"""Cliente HTTP do Traccar: autenticação, limites e falhas tipadas.
+
+Este módulo não conhece modelos Django nem a interface do mapa.
+O token permanece exclusivamente no backend.
+"""
+
+>>>>>>> paineis
 import logging
 from urllib.parse import urlsplit
 
@@ -6,7 +15,11 @@ from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
+<<<<<<< HEAD
 
+=======
+# Timeouts explícitos (conexão, leitura) para não bloquear requisições indefinidamente.
+>>>>>>> paineis
 TIMEOUT = (3.05, 7)
 
 
@@ -31,9 +44,16 @@ class TraccarResponseError(TraccarError):
 
 
 def traccar_get(endpoint):
+<<<<<<< HEAD
     """endpoint .
 
     Comentario trocar burro.
+=======
+    """Executa GET autenticado; devolve JSON sem expor segredos em erros.
+
+    `endpoint` é um caminho interno constante `/api/...`, jamais uma URL
+    enviada pelo navegador. Não fazemos requisições para hosts arbitrários.
+>>>>>>> paineis
     """
     if not isinstance(endpoint, str) or not endpoint.startswith('/api/'):
         raise ValueError('Endpoint Traccar inválido.')

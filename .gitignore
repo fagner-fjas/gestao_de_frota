@@ -15,4 +15,8 @@ assets/css/tailwind.css
 staticfiles/
 .django_tailwind_cli/
 .env.*.local
+<<<<<<< HEAD
 *.zip
+=======
+*.zip/docs/
+>>>>>>> paineis

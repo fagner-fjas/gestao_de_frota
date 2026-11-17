@@ -34,3 +34,19 @@ docker compose exec web python manage.py createsuperuser
 
 
 
+<<<<<<< HEAD
+=======
+
+### Gerar dados fictícios de demonstração
+
+Para testar o MVP sem cadastrar manualmente rotas, veículos, motoristas,
+passageiros, programações recorrentes e viagens:
+
+```bash
+docker compose exec web python manage.py migrate
+docker compose exec web python manage.py popular_dados_demo
+```
+
+O comando gera dados prefixados com `DEMO`, sem apagar ou sobrescrever registros.
+Leia [o guia completo de dados fictícios](docs/DADOS_DEMO.md) antes de usar.
+>>>>>>> paineis
