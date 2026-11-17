@@ -6,6 +6,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.db.models import Count
+from django.utils.dateparse import parse_date
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -29,7 +31,38 @@ class ProgramacaoLista(GestorRecorrenciasMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        return ProgramacaoRecorrente.objects.select_related('rota', 'motorista_padrao', 'veiculo_padrao')
+        queryset = ProgramacaoRecorrente.objects.select_related(
+            'rota', 'motorista_padrao', 'veiculo_padrao'
+        ).annotate(total_vinculados=Count('passageiros', distinct=True))
+        self.filtro_ativa = self.request.GET.get('ativa', '')
+        self.filtro_rota = self.request.GET.get('rota', '')
+        if self.filtro_ativa in ('1', '0'):
+            queryset = queryset.filter(ativa=self.filtro_ativa == '1')
+        if self.filtro_rota.isdecimal():
+            queryset = queryset.filter(rota_id=int(self.filtro_rota))
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['filtro_ativa'] = self.filtro_ativa
+        ctx['filtro_rota'] = self.filtro_rota
+        from .models import Rota
+        ctx['rotas_filtro'] = Rota.objects.filter(ativa=True).order_by('nome')
+        hoje = timezone.localdate()
+        for prog in ctx['object_list']:
+            # Reutiliza o mesmo mapeamento usado nos detalhes da programação.
+            dias = set(prog.dias_semana_indices)
+            prog.proxima_data = None
+            if prog.ativa and dias:
+                inicio = max(hoje, prog.data_inicio)
+                for deslocamento in range(7):
+                    candidato = inicio + timedelta(days=deslocamento)
+                    if prog.data_fim and candidato > prog.data_fim:
+                        break
+                    if candidato.weekday() in dias:
+                        prog.proxima_data = candidato
+                        break
+        return ctx
 
 
 class ProgramacaoDetalhe(GestorRecorrenciasMixin, DetailView):

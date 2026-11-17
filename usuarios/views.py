@@ -91,5 +91,10 @@ def plataforma(request):
             .order_by('cnh_validade')[:5]
         ),
         'hoje': hoje,
+        'viagens_hoje': (
+            Viagem.objects.filter(data_hora_partida__date=hoje)
+            .select_related('rota', 'veiculo', 'motorista')
+            .order_by('data_hora_partida')[:12]
+        ),
     }
     return render(request, 'usuarios/plataforma.html', contexto)

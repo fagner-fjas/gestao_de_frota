@@ -52,6 +52,29 @@ class RecorrenciaTest(TestCase):
         self.programacao.passageiros.add(self.passageiro, self.passageiro2)
         self.client.force_login(self.staff)
 
+
+    def test_dias_semana_por_extenso_e_resumidos(self):
+        self.assertEqual(self.programacao.dias_semana_por_extenso,
+                         'Segunda-feira, Terça-feira, Quarta-feira, Quinta-feira, Sexta-feira')
+        self.assertEqual(self.programacao.dias_semana_resumidos,
+                         'Seg, Ter, Qua, Qui, Sex')
+        self.assertEqual(self.programacao.dias_semana, '0,1,2,3,4')
+
+    def test_detalhe_programacao_mostra_dias_por_extenso(self):
+        resposta = self.client.get(reverse('programacao_detalhe', args=[self.programacao.pk]))
+        self.assertEqual(resposta.status_code, 200)
+        self.assertContains(resposta, 'Dias da semana')
+        self.assertContains(resposta,
+                            'Segunda-feira, Terça-feira, Quarta-feira, Quinta-feira, Sexta-feira')
+        self.assertNotContains(resposta, 'Dias (segunda=0)')
+
+    def test_dias_fim_de_semana_sao_legiveis(self):
+        self.programacao.dias_semana = '6,5'
+        self.assertEqual(self.programacao.dias_semana_por_extenso, 'Sábado, Domingo')
+        self.assertEqual(self.programacao.dias_semana_resumidos, 'Sáb, Dom')
+        self.programacao.dias_semana = '4,abc'
+        self.assertEqual(self.programacao.dias_semana_por_extenso, '—')
+
     def test_gera_apenas_dias_uteis_e_clona_vinculos(self):
         fim = self.segunda + timedelta(days=6)
         resultado = gerar_viagens(self.programacao.pk, self.segunda, fim)

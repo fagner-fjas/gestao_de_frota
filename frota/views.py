@@ -5,6 +5,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.db import transaction
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
+from django.utils.dateparse import parse_date
 from django.db.models.deletion import ProtectedError
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
@@ -242,14 +243,33 @@ class ViagemLista(ListaBase):
         queryset = super().get_queryset().select_related('rota', 'veiculo', 'motorista')
         queryset = queryset.prefetch_related('passageiros')
         self.status = self.request.GET.get('status', '')
-        if self.status:
+        self.data_filtro = self.request.GET.get('data', '').strip()
+        self.pendente = self.request.GET.get('pendente', '') == '1'
+        self.rota_filtro = self.request.GET.get('rota', '').strip()
+        if self.status in Viagem.Status.values:
             queryset = queryset.filter(status=self.status)
+        if self.data_filtro:
+            data = parse_date(self.data_filtro)
+            if data:
+                queryset = queryset.filter(data_hora_partida__date=data)
+        if self.rota_filtro.isdecimal():
+            queryset = queryset.filter(rota_id=int(self.rota_filtro))
+        if self.pendente:
+            queryset = queryset.filter(
+                programacao_recorrente__isnull=False,
+                status=Viagem.Status.AGENDADA,
+                confirmado_em__isnull=True,
+            )
         return queryset
 
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto['status'] = self.status
         contexto['status_choices'] = Viagem.Status.choices
+        contexto['data_filtro'] = self.data_filtro
+        contexto['rota_filtro'] = self.rota_filtro
+        contexto['pendente'] = self.pendente
+        contexto['rotas_filtro'] = Rota.objects.filter(ativa=True).order_by('nome')
         return contexto
 
 

@@ -161,6 +161,36 @@ class ProgramacaoRecorrente(models.Model):
     def __str__(self):
         return self.nome
 
+    # Os identificadores numéricos são mantidos no banco e usados pela lógica de geração.
+    # Somente a camada de apresentação deve exibir os nomes dos dias.
+    DIAS_EXTENSO = (
+        'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira',
+        'Sexta-feira', 'Sábado', 'Domingo',
+    )
+    DIAS_ABREVIADOS = ('Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom')
+
+    @property
+    def dias_semana_indices(self):
+        """Retorna os dias normalizados e ordenados, sem consultar o banco."""
+        try:
+            dias = [int(parte.strip()) for parte in self.dias_semana.split(',')]
+        except (AttributeError, ValueError):
+            return ()
+        if not dias or len(dias) != len(set(dias)) or any(d < 0 or d > 6 for d in dias):
+            return ()
+        return tuple(sorted(dias))
+
+    @property
+    def dias_semana_por_extenso(self):
+        """Ex.: 'Segunda-feira, Terça-feira, Quarta-feira'."""
+        return ', '.join(self.DIAS_EXTENSO[d] for d in self.dias_semana_indices) or '—'
+
+    @property
+    def dias_semana_resumidos(self):
+        """Ex.: 'Seg, Ter, Qua' para listagens compactas."""
+        return ', '.join(self.DIAS_ABREVIADOS[d] for d in self.dias_semana_indices) or '—'
+
+
 class Viagem(models.Model):
     class Status(models.TextChoices):
         AGENDADA = 'AGENDADA', 'Agendada'
