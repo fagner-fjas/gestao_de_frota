@@ -29,3 +29,16 @@ docker compose exec web python manage.py createsuperuser
 3. Recrie o serviço web: `docker compose up -d --force-recreate web`.
 4. No Django, abra **Dispositivos GPS**, sincronize e associe o dispositivo a um veículo; depois abra **Mapa da Frota**.
 
+
+### Gerar dados fictícios de demonstração
+
+Para testar o MVP sem cadastrar manualmente rotas, veículos, motoristas,
+passageiros, programações recorrentes e viagens:
+
+```bash
+docker compose exec web python manage.py migrate
+docker compose exec web python manage.py popular_dados_demo
+```
+
+O comando gera dados prefixados com `DEMO`, sem apagar ou sobrescrever registros.
+Leia [o guia completo de dados fictícios](docs/DADOS_DEMO.md) antes de usar.

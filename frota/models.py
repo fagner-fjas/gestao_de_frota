@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -119,6 +120,77 @@ class Passageiro(models.Model):
         return self.nome
 
 
+
+class ProgramacaoRecorrente(models.Model):
+    """Regra de recorrência. Cada data materializada será uma Viagem independente."""
+
+    nome = models.CharField(max_length=120)
+    rota = models.ForeignKey(Rota, on_delete=models.PROTECT)
+    motorista_padrao = models.ForeignKey(
+        Motorista, on_delete=models.PROTECT, related_name='programacoes_padrao'
+    )
+    veiculo_padrao = models.ForeignKey(
+        Veiculo, on_delete=models.PROTECT, related_name='programacoes_padrao'
+    )
+    passageiros = models.ManyToManyField(Passageiro, blank=True)
+    # Segunda-feira = 0, domingo = 6. Exemplo: "0,1,2,3,4".
+    dias_semana = models.CharField(max_length=13)
+    hora_partida = models.TimeField()
+    data_inicio = models.DateField()
+    data_fim = models.DateField(null=True, blank=True)
+    ativa = models.BooleanField(default=True)
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['nome', 'id']
+        verbose_name = 'programação recorrente'
+        verbose_name_plural = 'programações recorrentes'
+
+    def clean(self):
+        super().clean()
+        if self.data_fim and self.data_inicio and self.data_fim < self.data_inicio:
+            raise ValidationError({'data_fim': 'A data final deve ser posterior à inicial.'})
+        try:
+            dias = [int(item) for item in self.dias_semana.split(',')]
+        except (ValueError, AttributeError):
+            dias = []
+        if not dias or len(set(dias)) != len(dias) or not set(dias).issubset(set(range(7))):
+            raise ValidationError({'dias_semana': 'Escolha dias válidos, sem repetições.'})
+
+    def __str__(self):
+        return self.nome
+
+    # Os identificadores numéricos são mantidos no banco e usados pela lógica de geração.
+    # Somente a camada de apresentação deve exibir os nomes dos dias.
+    DIAS_EXTENSO = (
+        'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira',
+        'Sexta-feira', 'Sábado', 'Domingo',
+    )
+    DIAS_ABREVIADOS = ('Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom')
+
+    @property
+    def dias_semana_indices(self):
+        """Retorna os dias normalizados e ordenados, sem consultar o banco."""
+        try:
+            dias = [int(parte.strip()) for parte in self.dias_semana.split(',')]
+        except (AttributeError, ValueError):
+            return ()
+        if not dias or len(dias) != len(set(dias)) or any(d < 0 or d > 6 for d in dias):
+            return ()
+        return tuple(sorted(dias))
+
+    @property
+    def dias_semana_por_extenso(self):
+        """Ex.: 'Segunda-feira, Terça-feira, Quarta-feira'."""
+        return ', '.join(self.DIAS_EXTENSO[d] for d in self.dias_semana_indices) or '—'
+
+    @property
+    def dias_semana_resumidos(self):
+        """Ex.: 'Seg, Ter, Qua' para listagens compactas."""
+        return ', '.join(self.DIAS_ABREVIADOS[d] for d in self.dias_semana_indices) or '—'
+
+
 class Viagem(models.Model):
     class Status(models.TextChoices):
         AGENDADA = 'AGENDADA', 'Agendada'
@@ -126,6 +198,17 @@ class Viagem(models.Model):
         CONCLUIDA = 'CONCLUIDA', 'Concluída'
         CANCELADA = 'CANCELADA', 'Cancelada'
 
+    programacao_recorrente = models.ForeignKey(
+        ProgramacaoRecorrente, null=True, blank=True,
+        on_delete=models.PROTECT, related_name='viagens',
+    )
+    data_programada = models.DateField(null=True, blank=True)
+    passageiros_embarcados = models.PositiveIntegerField(null=True, blank=True)
+    confirmado_em = models.DateTimeField(null=True, blank=True)
+    confirmado_por = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='viagens_confirmadas',
+    )
     data_hora_partida = models.DateTimeField('data e hora de partida', db_index=True)
     rota = models.ForeignKey(Rota, on_delete=models.PROTECT)
     veiculo = models.ForeignKey(Veiculo, on_delete=models.PROTECT, verbose_name='veículo')
@@ -139,6 +222,10 @@ class Viagem(models.Model):
         ordering = ['data_hora_partida']
         verbose_name = 'viagem'
         verbose_name_plural = 'viagens'
+        constraints = [models.UniqueConstraint(
+            fields=['programacao_recorrente', 'data_programada'],
+            name='unica_viagem_por_programacao_data',
+        )]
 
     @property
     def total_passageiros(self):

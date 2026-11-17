@@ -3,7 +3,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db import transaction
+from django.core.exceptions import PermissionDenied
 from django.db.models import Q
+from django.utils.dateparse import parse_date
 from django.db.models.deletion import ProtectedError
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
@@ -241,22 +243,41 @@ class ViagemLista(ListaBase):
         queryset = super().get_queryset().select_related('rota', 'veiculo', 'motorista')
         queryset = queryset.prefetch_related('passageiros')
         self.status = self.request.GET.get('status', '')
-        if self.status:
+        self.data_filtro = self.request.GET.get('data', '').strip()
+        self.pendente = self.request.GET.get('pendente', '') == '1'
+        self.rota_filtro = self.request.GET.get('rota', '').strip()
+        if self.status in Viagem.Status.values:
             queryset = queryset.filter(status=self.status)
+        if self.data_filtro:
+            data = parse_date(self.data_filtro)
+            if data:
+                queryset = queryset.filter(data_hora_partida__date=data)
+        if self.rota_filtro.isdecimal():
+            queryset = queryset.filter(rota_id=int(self.rota_filtro))
+        if self.pendente:
+            queryset = queryset.filter(
+                programacao_recorrente__isnull=False,
+                status=Viagem.Status.AGENDADA,
+                confirmado_em__isnull=True,
+            )
         return queryset
 
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         contexto['status'] = self.status
         contexto['status_choices'] = Viagem.Status.choices
+        contexto['data_filtro'] = self.data_filtro
+        contexto['rota_filtro'] = self.rota_filtro
+        contexto['pendente'] = self.pendente
+        contexto['rotas_filtro'] = Rota.objects.filter(ativa=True).order_by('nome')
         return contexto
 
 
 class ViagemDetalhe(DetalheBase):
     model = Viagem
     template_name = 'frota/viagem_detalhe.html'
-    campos_extra = [('passageiros_texto', 'Passageiros'),
-                    ('total_passageiros', 'Quantidade de passageiros')]
+    campos_extra = [('passageiros_texto', 'Passageiros previstos'),
+                    ('total_passageiros', 'Quantidade de passageiros previstos')]
 
 
 class ViagemCriar(CriarBase):
@@ -271,14 +292,24 @@ class ViagemEditar(EditarBase):
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             viagem = self.get_object()
-            if viagem.status != Viagem.Status.AGENDADA:
-                messages.error(request, 'Somente viagens com status Agendada podem ser editadas.')
+            if viagem.programacao_recorrente_id and not request.user.is_staff:
+                raise PermissionDenied('Apenas gestores podem alterar viagens recorrentes.')
+            if viagem.status != Viagem.Status.AGENDADA or viagem.confirmado_em:
+                messages.error(request, 'Somente viagens agendadas e ainda não confirmadas podem ser editadas.')
                 return redirect('viagem_detalhe', pk=viagem.pk)
         return super().dispatch(request, *args, **kwargs)
 
 
 class ViagemExcluir(ExcluirBase):
     model = Viagem
+
+    def post(self, request, *args, **kwargs):
+        viagem = self.get_object()
+        if viagem.programacao_recorrente_id:
+            messages.error(request, 'Viagens recorrentes devem ser canceladas, não excluídas. Histórico preservado.')
+            return redirect('viagem_detalhe', pk=viagem.pk)
+        return super().post(request, *args, **kwargs)
+
 
 
 TRANSICOES = {
@@ -295,12 +326,19 @@ def mudar_status(request, pk, acao):
         raise Http404
     viagem = get_object_or_404(Viagem.objects.select_related('veiculo'), pk=pk)
     origens, destino = TRANSICOES[acao]
+    if viagem.programacao_recorrente_id and not request.user.is_staff:
+        raise PermissionDenied('Apenas gestores podem alterar viagens recorrentes.')
 
     if viagem.status not in origens:
         messages.error(
             request,
             f'Não é possível executar "{acao}" numa viagem {viagem.get_status_display().lower()}.',
         )
+        return redirect('viagem_detalhe', pk=pk)
+
+    if (destino == Viagem.Status.EM_ANDAMENTO
+            and viagem.programacao_recorrente_id and not viagem.confirmado_em):
+        messages.error(request, 'Confirme o motorista, o veículo e o embarque antes de iniciar.')
         return redirect('viagem_detalhe', pk=pk)
 
     veiculo = viagem.veiculo
