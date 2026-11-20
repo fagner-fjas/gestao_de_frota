@@ -1,4 +1,3 @@
-/* Entrega 4. Sem credenciais nem URLs de Traccar no navegador. */
 (() => {
   'use strict';
   const raiz = document.getElementById('gps-monitoramento');

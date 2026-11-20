@@ -53,8 +53,6 @@ class MotoristaForm(forms.ModelForm):
 class VeiculoForm(forms.ModelForm):
     class Meta:
         model = Veiculo
-        # O campo legado traccar_device_id é mantido exclusivamente pelo
-        # serviço de associações até a migração do mapa (Entrega 4).
         fields = [
             'placa', 'marca', 'modelo', 'ano', 'tipo', 'capacidade',
             'quilometragem', 'situacao',
@@ -62,7 +60,6 @@ class VeiculoForm(forms.ModelForm):
 
     def clean_placa(self):
         placa = self.cleaned_data['placa'].upper().replace('-', '').strip()
-        # Formato antigo (ABC1234) ou Mercosul (ABC1D23).
         if not re.fullmatch(r'[A-Z]{3}\d[A-Z0-9]\d{2}', placa):
             raise forms.ValidationError('Placa inválida. Use ABC1234 ou ABC1D23.')
         return placa
