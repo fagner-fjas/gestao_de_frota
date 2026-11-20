@@ -24,11 +24,7 @@
 
   <div class="mt-6 flex flex-wrap gap-3 border-t border-gray-100 pt-5">
     <a href="{% url url_base|add:'_editar' object.pk %}" class="botao-primario">Editar</a>
-<<<<<<< HEAD
-    <a href="{% url url_base|add:'_excluir' object.pk %}" class="botao-perigo">Excluir</a>
-=======
     {% if not object.programacao_recorrente_id %}<a href="{% url url_base|add:'_excluir' object.pk %}" class="botao-perigo">Excluir</a>{% endif %}
->>>>>>> paineis
     <a href="{% url url_base|add:'_lista' %}" class="botao-secundario">Voltar à lista</a>
   </div>
 </div>

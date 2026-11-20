@@ -4,42 +4,28 @@
 {% block conteudo %}
 <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
   <h1 class="text-title-xs font-semibold text-gray-800">{{ nome_plural|capfirst }}</h1>
-<<<<<<< HEAD
-  <a href="{% url url_base|add:'_nova' %}" class="botao-primario">+ Novo cadastro</a>
-=======
   <a href="{% url url_base|add:'_nova' %}" class="botao-primario">+ Novo {{ nome }}</a>
->>>>>>> paineis
 </div>
 
 <div class="cartao">
   <form method="get" class="mb-5 flex flex-col gap-3 sm:flex-row">
-<<<<<<< HEAD
-    <input type="text" name="q" value="{{ q }}" placeholder="Buscar..." class="campo sm:max-w-xs">
-    {% if status_choices %}
-      <select name="status" class="campo sm:max-w-48">
-=======
     <label class="sr-only" for="busca-cadastros">Buscar em {{ nome_plural }}</label>
     <input id="busca-cadastros" type="search" name="q" value="{{ q }}" placeholder="Buscar {{ nome_plural }}..." class="campo sm:max-w-xs">
     {% if status_choices %}
       <label class="sr-only" for="status-viagem">Filtrar por status</label>
       <select id="status-viagem" name="status" class="campo sm:max-w-48">
->>>>>>> paineis
         <option value="">Todos os status</option>
         {% for valor, rotulo in status_choices %}
           <option value="{{ valor }}" {% if valor == status %}selected{% endif %}>{{ rotulo }}</option>
         {% endfor %}
       </select>
     {% endif %}
-<<<<<<< HEAD
-    <button type="submit" class="botao-primario">Buscar</button>
-=======
     {% if url_base == 'viagem' %}
       <label class="sr-only" for="data-viagem">Data da viagem</label><input id="data-viagem" type="date" name="data" value="{{ data_filtro }}" class="campo">
       <label class="sr-only" for="rota-viagem">Rota</label><select id="rota-viagem" name="rota" class="campo"><option value="">Todas as rotas</option>{% for rota in rotas_filtro %}<option value="{{ rota.pk }}" {% if rota_filtro == rota.pk|stringformat:'s' %}selected{% endif %}>{{ rota.nome }}</option>{% endfor %}</select>
       <label class="inline-flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" name="pendente" value="1" {% if pendente %}checked{% endif %}> Pendentes de confirmação</label>
     {% endif %}
     <button type="submit" class="botao-primario">Filtrar</button>
->>>>>>> paineis
     <a href="{% url url_base|add:'_lista' %}" class="botao-secundario">Limpar</a>
   </form>
 
@@ -68,14 +54,8 @@
               </td>
             {% endfor %}
             <td class="px-4 py-3.5 text-right text-theme-sm whitespace-nowrap">
-<<<<<<< HEAD
-              <a href="{% url url_base|add:'_detalhe' obj.pk %}" class="font-medium text-gray-600 hover:text-brand-500">Ver</a>
-              <a href="{% url url_base|add:'_editar' obj.pk %}" class="ml-3 font-medium text-brand-500 hover:text-brand-600">Editar</a>
-              <a href="{% url url_base|add:'_excluir' obj.pk %}" class="ml-3 font-medium text-error-500 hover:text-error-600">Excluir</a>
-=======
               {% if url_base == 'viagem' and request.user.is_staff and obj.programacao_recorrente_id and not obj.confirmado_em and obj.status == 'AGENDADA' %}<a href="{% url 'viagem_confirmar_recorrente' obj.pk %}" class="botao-primario inline-flex">Confirmar</a>{% else %}<a href="{% url url_base|add:'_detalhe' obj.pk %}" class="botao-secundario inline-flex">Detalhes</a>{% endif %}
               <details class="relative ml-2 inline-block text-left"><summary class="cursor-pointer rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-brand-500" aria-label="Outras ações">Mais</summary><div class="absolute right-0 z-20 mt-1 flex min-w-32 flex-col gap-1 rounded-xl border border-gray-200 bg-white p-2 shadow-lg"><a href="{% url url_base|add:'_editar' obj.pk %}" class="rounded px-3 py-2 hover:bg-gray-50">Editar</a><a href="{% url url_base|add:'_excluir' obj.pk %}" class="rounded px-3 py-2 text-error-600 hover:bg-error-50">Excluir...</a></div></details>
->>>>>>> paineis
             </td>
           </tr>
         {% empty %}
@@ -90,17 +70,10 @@
       <span>Página {{ page_obj.number }} de {{ paginator.num_pages }}</span>
       <div class="flex gap-2">
         {% if page_obj.has_previous %}
-<<<<<<< HEAD
-          <a class="botao-secundario" href="?page={{ page_obj.previous_page_number }}&q={{ q|urlencode }}&status={{ status|urlencode }}">« Anterior</a>
-        {% endif %}
-        {% if page_obj.has_next %}
-          <a class="botao-secundario" href="?page={{ page_obj.next_page_number }}&q={{ q|urlencode }}&status={{ status|urlencode }}">Próxima »</a>
-=======
           <a class="botao-secundario" href="?page={{ page_obj.previous_page_number }}&q={{ q|urlencode }}&status={{ status|urlencode }}&data={{ data_filtro|urlencode }}&rota={{ rota_filtro|urlencode }}{% if pendente %}&pendente=1{% endif %}">« Anterior</a>
         {% endif %}
         {% if page_obj.has_next %}
           <a class="botao-secundario" href="?page={{ page_obj.next_page_number }}&q={{ q|urlencode }}&status={{ status|urlencode }}&data={{ data_filtro|urlencode }}&rota={{ rota_filtro|urlencode }}{% if pendente %}&pendente=1{% endif %}">Próxima »</a>
->>>>>>> paineis
         {% endif %}
       </div>
     </div>

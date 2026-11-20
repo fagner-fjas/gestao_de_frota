@@ -5,12 +5,8 @@ from django import forms
 from django.db.models import Q
 from django.utils import timezone
 
-<<<<<<< HEAD
-from .models import Motorista, Passageiro, Rota, Veiculo, Viagem
-=======
 from .models import Motorista, Passageiro, ProgramacaoRecorrente, Rota, Veiculo, Viagem
 from .services.agenda import conflitos_de_agenda
->>>>>>> paineis
 
 
 def campo_data():
@@ -57,8 +53,6 @@ class MotoristaForm(forms.ModelForm):
 class VeiculoForm(forms.ModelForm):
     class Meta:
         model = Veiculo
-        # O campo legado traccar_device_id é mantido exclusivamente pelo
-        # serviço de associações até a migração do mapa (Entrega 4).
         fields = [
             'placa', 'marca', 'modelo', 'ano', 'tipo', 'capacidade',
             'quilometragem', 'situacao',
@@ -66,7 +60,6 @@ class VeiculoForm(forms.ModelForm):
 
     def clean_placa(self):
         placa = self.cleaned_data['placa'].upper().replace('-', '').strip()
-        # Formato antigo (ABC1234) ou Mercosul (ABC1D23).
         if not re.fullmatch(r'[A-Z]{3}\d[A-Z0-9]\d{2}', placa):
             raise forms.ValidationError('Placa inválida. Use ABC1234 ou ABC1D23.')
         return placa
@@ -119,14 +112,11 @@ class ViagemForm(forms.ModelForm):
         passageiros = dados.get('passageiros')
 
         mudou_data = not self.instance.pk or 'data_hora_partida' in self.changed_data
-<<<<<<< HEAD
-=======
         if (partida and self.instance.programacao_recorrente_id
                 and self.instance.data_programada
                 and timezone.localtime(partida).date() != self.instance.data_programada):
             self.add_error('data_hora_partida', 'A data de uma viagem recorrente não pode ser alterada.')
 
->>>>>>> paineis
         if partida and mudou_data and partida < timezone.now():
             self.add_error('data_hora_partida', 'A data e hora de partida não podem estar no passado.')
 
@@ -146,44 +136,6 @@ class ViagemForm(forms.ModelForm):
         return dados
 
     def verificar_conflitos(self, partida, rota, veiculo, motorista, passageiros):
-<<<<<<< HEAD
-        fim = partida + timedelta(minutes=rota.duracao_minutos)
-
-        filtro = Q()
-        if veiculo:
-            filtro |= Q(veiculo=veiculo)
-        if motorista:
-            filtro |= Q(motorista=motorista)
-        if passageiros:
-            filtro |= Q(passageiros__in=passageiros)
-        if not filtro:
-            return
-
-        outras = Viagem.objects.filter(
-            status__in=[Viagem.Status.AGENDADA, Viagem.Status.EM_ANDAMENTO]
-        ).select_related('rota').prefetch_related('passageiros')
-        if self.instance.pk:
-            outras = outras.exclude(pk=self.instance.pk)
-
-        ids_selecionados = {p.pk for p in passageiros or []}
-        for outra in outras.filter(filtro).distinct():
-            outra_fim = outra.data_hora_partida + timedelta(minutes=outra.rota.duracao_minutos)
-            if not (partida < outra_fim and outra.data_hora_partida < fim):
-                continue  
-
-            referencia = f'viagem #{outra.pk} ({outra})'
-            if veiculo and outra.veiculo_id == veiculo.pk:
-                self.add_error('veiculo', f'Veículo já alocado na {referencia}.')
-            if motorista and outra.motorista_id == motorista.pk:
-                self.add_error('motorista', f'Motorista já alocado na {referencia}.')
-            em_conflito = [p.nome for p in outra.passageiros.all() if p.pk in ids_selecionados]
-            if em_conflito:
-                self.add_error(
-                    'passageiros',
-                    f'Passageiro(s) já em outra viagem no mesmo período: '
-                    f'{", ".join(em_conflito)} ({referencia}).',
-                )
-=======
         for campo, mensagem in conflitos_de_agenda(
             partida, rota, veiculo, motorista, passageiros, excluir_id=self.instance.pk
         ):
@@ -300,4 +252,3 @@ class ConfirmacaoEmbarqueForm(forms.Form):
                 else:
                     self.add_error(None, mensagem)
         return dados
->>>>>>> paineis

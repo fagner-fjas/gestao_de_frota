@@ -1,9 +1,6 @@
 from decimal import Decimal
 
-<<<<<<< HEAD
-=======
 from django.conf import settings
->>>>>>> paineis
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -123,8 +120,6 @@ class Passageiro(models.Model):
         return self.nome
 
 
-<<<<<<< HEAD
-=======
 
 class ProgramacaoRecorrente(models.Model):
     """Regra de recorrência. Cada data materializada será uma Viagem independente."""
@@ -196,7 +191,6 @@ class ProgramacaoRecorrente(models.Model):
         return ', '.join(self.DIAS_ABREVIADOS[d] for d in self.dias_semana_indices) or '—'
 
 
->>>>>>> paineis
 class Viagem(models.Model):
     class Status(models.TextChoices):
         AGENDADA = 'AGENDADA', 'Agendada'
@@ -204,8 +198,6 @@ class Viagem(models.Model):
         CONCLUIDA = 'CONCLUIDA', 'Concluída'
         CANCELADA = 'CANCELADA', 'Cancelada'
 
-<<<<<<< HEAD
-=======
     programacao_recorrente = models.ForeignKey(
         ProgramacaoRecorrente, null=True, blank=True,
         on_delete=models.PROTECT, related_name='viagens',
@@ -217,7 +209,6 @@ class Viagem(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
         related_name='viagens_confirmadas',
     )
->>>>>>> paineis
     data_hora_partida = models.DateTimeField('data e hora de partida', db_index=True)
     rota = models.ForeignKey(Rota, on_delete=models.PROTECT)
     veiculo = models.ForeignKey(Veiculo, on_delete=models.PROTECT, verbose_name='veículo')
@@ -231,13 +222,10 @@ class Viagem(models.Model):
         ordering = ['data_hora_partida']
         verbose_name = 'viagem'
         verbose_name_plural = 'viagens'
-<<<<<<< HEAD
-=======
         constraints = [models.UniqueConstraint(
             fields=['programacao_recorrente', 'data_programada'],
             name='unica_viagem_por_programacao_data',
         )]
->>>>>>> paineis
 
     @property
     def total_passageiros(self):

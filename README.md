@@ -34,8 +34,6 @@ docker compose exec web python manage.py createsuperuser
 
 
 
-<<<<<<< HEAD
-=======
 
 ### Gerar dados fictícios de demonstração
 
@@ -49,4 +47,3 @@ docker compose exec web python manage.py popular_dados_demo
 
 O comando gera dados prefixados com `DEMO`, sem apagar ou sobrescrever registros.
 Leia [o guia completo de dados fictícios](docs/DADOS_DEMO.md) antes de usar.
->>>>>>> paineis

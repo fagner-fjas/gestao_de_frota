@@ -1,9 +1,4 @@
 from django.urls import path
-<<<<<<< HEAD
-from . import views
-
-urlpatterns = [
-=======
 from . import views, views_recorrencias
 
 urlpatterns = [
@@ -15,7 +10,6 @@ urlpatterns = [
     path('viagens/recorrencias/<int:pk>/gerar/', views_recorrencias.programacao_gerar, name='programacao_gerar'),
     path('viagens/<int:pk>/confirmar/', views_recorrencias.confirmar_viagem, name='viagem_confirmar_recorrente'),
 
->>>>>>> paineis
     # Rotas
     path('rotas/', views.RotaLista.as_view(), name='rota_lista'),
     path('rotas/nova/', views.RotaCriar.as_view(), name='rota_nova'),

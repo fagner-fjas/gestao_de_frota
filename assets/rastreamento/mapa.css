@@ -1,4 +1,3 @@
-/* Entrega 4: CSS escopado do mapa; não altera estilos dos demais CRUDs. */
 #gps-mapa {height: min(66vh, 650px);min-height: 390px;width: 100%;border-radius: 10px;z-index: 0;background:#e9eef1;}
 .gps-mapa-cartao { min-width: 0; }
 .gps-lista { max-height: 650px; overflow-y: auto; display: flex; flex-direction: column; gap: 9px; }

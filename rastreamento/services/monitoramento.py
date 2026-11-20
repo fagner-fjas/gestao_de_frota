@@ -1,11 +1,8 @@
-<<<<<<< HEAD
-=======
 """Visão operacional da frota a partir dos vínculos Django e da API Traccar.
 
 Sem persistir telemetria no MySQL. Um veículo sem posição continua no resultado.
 O estado da comunicação do dispositivo não equivale à idade da posição GPS.
 """
->>>>>>> paineis
 from datetime import timezone as dt_timezone
 from math import isfinite
 
@@ -16,10 +13,7 @@ from rastreamento.models import DispositivoGPS
 from .dispositivos import listar_dispositivos
 from .localizacao import ultimas_posicoes
 
-<<<<<<< HEAD
-=======
 # Margem para atrasos de rede/relógio ao transmitir aproximadamente a cada 60 s.
->>>>>>> paineis
 LIMITE_RECENTE_SEGUNDOS = 90
 LIMITE_ATRASADA_SEGUNDOS = 180
 TOLERANCIA_FUTURO_SEGUNDOS = 60
@@ -45,11 +39,8 @@ def _idade_posicao(horario, agora):
     if instante is None:
         return None
     if timezone.is_naive(instante):
-<<<<<<< HEAD
-=======
         # Horários Traccar normalmente possuem Z (UTC); em caso de ausência,
         # interpretamos UTC e nunca assumimos o fuso do navegador.
->>>>>>> paineis
         instante = instante.replace(tzinfo=dt_timezone.utc)
     idade = (agora - instante).total_seconds()
     if idade < -TOLERANCIA_FUTURO_SEGUNDOS:
@@ -71,14 +62,11 @@ def _estado_localizacao(posicao, agora):
 
 
 def consultar_mapa_frota():
-<<<<<<< HEAD
-=======
     """Retorna todos os veículos com GPS administrativamente ativo e associado.
 
     Somente duas consultas à API por atualização, independentemente do número
     de veículos. Todos os IDs associados vêm do banco, não do navegador.
     """
->>>>>>> paineis
     gps_vinculados = list(
         DispositivoGPS.objects.filter(ativo=True, veiculo__isnull=False)
         .select_related('veiculo')

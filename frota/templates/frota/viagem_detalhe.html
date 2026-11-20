@@ -1,15 +1,12 @@
 {% extends 'frota/detalhe.html' %}
 {% block acoes_extras %}
 <div class="mt-6 flex flex-wrap gap-3 border-t border-gray-100 pt-5">
-<<<<<<< HEAD
-=======
   {% if object.programacao_recorrente_id and object.status == 'AGENDADA' and not object.confirmado_em and request.user.is_staff %}
     <a class="botao-secundario" href="{% url 'viagem_confirmar_recorrente' object.pk %}">Confirmar veículo e embarque</a>
   {% endif %}
   {% if object.programacao_recorrente_id %}
     <a class="botao-secundario" href="{% url 'programacao_detalhe' object.programacao_recorrente_id %}">Ver programação</a>
   {% endif %}
->>>>>>> paineis
   {% if object.status == 'AGENDADA' %}
     <form method="post" action="{% url 'viagem_status' object.pk 'iniciar' %}">
       {% csrf_token %}<button type="submit" class="botao-primario">Iniciar viagem</button>

@@ -1,16 +1,10 @@
-<<<<<<< HEAD
-=======
 """Consultas de dispositivos no Traccar (somente leitura, MVP)."""
 
->>>>>>> paineis
 from .client import TraccarResponseError, traccar_get_collection
 
 
 def listar_dispositivos():
-<<<<<<< HEAD
-=======
     """Dispositivos visíveis para o token da integração."""
->>>>>>> paineis
     dispositivos = traccar_get_collection('/api/devices', ('id', 'name'))
     for dispositivo in dispositivos:
         identificador = dispositivo['id']

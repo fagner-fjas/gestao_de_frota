@@ -1,18 +1,12 @@
-<<<<<<< HEAD
-=======
 """Consulta das últimas posições disponíveis, sem persistência no Django."""
 
->>>>>>> paineis
 from math import isfinite
 
 from .client import TraccarResponseError, traccar_get_collection
 
 
 def ultimas_posicoes():
-<<<<<<< HEAD
-=======
     """Últimas posições conhecidas (não necessariamente atuais)."""
->>>>>>> paineis
     posicoes = traccar_get_collection(
         '/api/positions', ('deviceId', 'latitude', 'longitude')
     )

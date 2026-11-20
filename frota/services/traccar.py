@@ -1,9 +1,3 @@
-"""Adaptador temporário para imports antigos da API Traccar.
-
-O mapa usa diretamente `rastreamento.services` desde a Entrega 4.
-Esta compatibilidade é mantida para outros consumidores e testes legados.
-"""
-
 from rastreamento.services.client import (
     TraccarError,
     TraccarConfigError,
