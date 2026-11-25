@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
-{% load ui %}
+{% load ui static %}
 {% block titulo %}Programação recorrente{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'seletor_passageiros.css' %}">{% endblock %}
+{% block extra_js %}<script defer src="{% static 'seletor_passageiros.js' %}"></script>{% endblock %}
 {% block conteudo %}
 <h1 class="mb-6 text-title-xs font-semibold text-gray-800">{% if object %}Editar{% else %}Criar{% endif %} programação recorrente</h1>
 <form method="post" class="cartao max-w-4xl">
@@ -11,11 +13,7 @@
       <div class="{% if campo.name == 'passageiros' or campo.name == 'dias_semana' %}md:col-span-2{% endif %}">
         <label class="rotulo" for="{{ campo.id_for_label }}">{{ campo.label }}</label>
         {% if campo.name == 'passageiros' or campo.name == 'dias_semana' %}
-          {% if campo.name == 'passageiros' %}<div data-seletor-passageiros class="rounded-xl border border-gray-200 p-4">
-            <label for="buscar-passageiro-rec" class="rotulo">Buscar passageiros</label><input id="buscar-passageiro-rec" type="search" data-busca-passageiros class="campo mb-3" placeholder="Digite parte do nome">
-            <div class="mb-3 flex flex-wrap items-center gap-2"><button type="button" data-marcar-visiveis class="botao-secundario">Selecionar resultados visíveis</button><button type="button" data-limpar-passageiros class="botao-secundario">Limpar seleção</button><span data-contador-passageiros aria-live="polite" class="text-sm text-gray-600"></span></div>
-            <div class="max-h-64 space-y-2 overflow-y-auto text-sm [&_label]:flex [&_label]:items-center [&_label]:gap-2">{{ campo }}</div>
-          </div>{% else %}<div class="space-y-2 rounded-lg border border-gray-200 p-3 text-sm [&_label]:flex [&_label]:items-center [&_label]:gap-2">{{ campo }}</div>{% endif %}
+          {% if campo.name == 'passageiros' %}{% include 'frota/seletor_passageiros.html' with campo=campo %}{% else %}<div class="space-y-2 rounded-lg border border-gray-200 p-3 text-sm [&_label]:flex [&_label]:items-center [&_label]:gap-2">{{ campo }}</div>{% endif %}
         {% else %}
           {{ campo|estilizar }}
         {% endif %}
@@ -26,32 +24,4 @@
   <div class="mt-5 rounded-lg bg-gray-50 p-3 text-sm text-gray-600">Alterações na programação afetam somente futuras gerações; viagens existentes não são sobrescritas.</div>
   <div class="mt-6 flex gap-3"><button class="botao-primario" type="submit">Salvar programação</button><a class="botao-secundario" href="{% url 'programacao_lista' %}">Voltar</a></div>
 </form>
-<script>
-// Aprimoramento progressivo: checkbox nativo permanece disponível sem JavaScript.
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('[data-seletor-passageiros]').forEach((container) => {
-    const busca = container.querySelector('[data-busca-passageiros]');
-    const contador = container.querySelector('[data-contador-passageiros]');
-    const marcar = container.querySelector('[data-marcar-visiveis]');
-    const limpar = container.querySelector('[data-limpar-passageiros]');
-    const checkboxes = [...container.querySelectorAll('input[type="checkbox"]')];
-    function atualizar() {
-      const termo = (busca.value || '').trim().toLocaleLowerCase('pt-BR');
-      for (const cb of checkboxes) {
-        const rotulo = cb.closest('label') || cb.parentElement;
-        if (!rotulo) continue;
-        rotulo.hidden = !!termo && !rotulo.textContent.toLocaleLowerCase('pt-BR').includes(termo);
-        rotulo.style.display = rotulo.hidden ? 'none' : '';
-      }
-      const selecionados = checkboxes.filter(cb => cb.checked).length;
-      contador.textContent = selecionados + ' passageiro(s) selecionado(s)';
-    }
-    busca.addEventListener('input', atualizar);
-    container.addEventListener('change', atualizar);
-    marcar.addEventListener('click', () => {for(const cb of checkboxes) if (!(cb.closest('label')||cb.parentElement).hidden) cb.checked=true; atualizar();});
-    limpar.addEventListener('click', () => {for(const cb of checkboxes) cb.checked=false; atualizar();});
-    atualizar();
-  });
-});
-</script>
 {% endblock %}

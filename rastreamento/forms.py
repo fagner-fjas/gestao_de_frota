@@ -1,4 +1,4 @@
-"""Formulários administrativos do módulo GPS."""
+"""Formulários administrativos do GPS."""
 
 from django import forms
 
@@ -16,8 +16,6 @@ class AssociacaoGPSForm(forms.Form):
 
     def __init__(self, *args, dispositivo, **kwargs):
         super().__init__(*args, **kwargs)
-        # Não oferecer veículos vinculados a outros GPS; a camada de serviço
-        # também verifica o conflito, inclusive em requisições concorrentes.
         livres = Veiculo.objects.filter(dispositivo_gps__isnull=True)
         if dispositivo.veiculo_id is not None:
             livres = Veiculo.objects.filter(

@@ -1,0 +1,61 @@
+<div class="ps-picker" data-passenger-picker>
+  <div class="ps-summary">
+    <div>
+      <span class="ps-summary-caption">Passageiros vinculados</span>
+      <strong class="ps-summary-total" data-ps-summary aria-live="polite">Selecione os passageiros da viagem</strong>
+    </div>
+    <button type="button" class="ps-button ps-primary botao-primario" data-ps-open>+ Adicionar passageiros</button>
+  </div>
+  <div class="ps-native" data-ps-native>{{ campo }}</div>
+  <div class="ps-modal" data-ps-modal hidden>
+    <div class="ps-backdrop" data-ps-cancel></div>
+    <section class="ps-dialog" role="dialog" aria-modal="true" aria-label="Selecionar passageiros" tabindex="-1" data-ps-dialog>
+      <header class="ps-header">
+        <div>
+          <h2>Selecionar passageiros</h2>
+          <p>Pesquise e adicione pessoas à viagem ou à programação recorrente.</p>
+        </div>
+        <button type="button" class="ps-close" data-ps-cancel aria-label="Fechar seletor">&times;</button>
+      </header>
+      <div class="ps-columns">
+        <div class="ps-available">
+          <h3>Disponíveis</h3>
+          <div class="ps-search-wrap">
+            <input type="search" class="ps-search" data-ps-search placeholder="Buscar por nome ou documento" aria-label="Pesquisar passageiros" autocomplete="off">
+            <button type="button" class="ps-search-clear" data-ps-clear aria-label="Limpar pesquisa">&times;</button>
+          </div>
+          <div class="ps-filters" role="group" aria-label="Filtros de passageiros">
+            <button type="button" data-ps-filter="all" aria-pressed="true" class="ps-filter ps-filter-active">Todos</button>
+            <button type="button" data-ps-filter="active" aria-pressed="false" class="ps-filter">Ativos</button>
+            <button type="button" data-ps-filter="unlinked" aria-pressed="false" class="ps-filter" title="Passageiros sem viagens ou programações vinculadas">Sem vínculo</button>
+          </div>
+          <div class="ps-list-actions">
+            <span data-ps-results-count aria-live="polite">0 resultados</span>
+            <button type="button" class="ps-text-action" data-ps-select-page>Selecionar resultados visíveis</button>
+          </div>
+          <div class="ps-list" data-ps-available-list></div>
+          <div class="ps-pagination">
+            <span data-ps-page-status></span>
+            <div class="ps-pagination-controls">
+              <button type="button" data-ps-prev aria-label="Página anterior">Anterior</button>
+              <button type="button" data-ps-next aria-label="Próxima página">Próxima</button>
+            </div>
+          </div>
+        </div>
+        <aside class="ps-selected">
+          <h3>Selecionados (<span data-ps-count>0</span>)</h3>
+          <p class="ps-selected-intro" data-ps-selected-description>0 passageiros escolhidos</p>
+          <div class="ps-selected-list" data-ps-selected-list></div>
+          <button type="button" class="ps-text-action ps-clear-all" data-ps-clear-all>Limpar toda a seleção</button>
+        </aside>
+      </div>
+      <footer class="ps-footer">
+        <strong data-ps-footer-count aria-live="polite">0 selecionados</strong>
+        <div class="ps-footer-actions">
+          <button type="button" class="ps-button ps-secondary botao-secundario" data-ps-cancel>Cancelar</button>
+          <button type="button" class="ps-button ps-primary botao-primario" data-ps-apply>Aplicar seleção</button>
+        </div>
+      </footer>
+    </section>
+  </div>
+</div>

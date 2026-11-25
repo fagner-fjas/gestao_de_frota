@@ -2,7 +2,7 @@ import re
 from datetime import date, timedelta
 
 from django import forms
-from django.db.models import Q
+from django.db.models import Exists, OuterRef, Q
 from django.utils import timezone
 
 from .models import Motorista, Passageiro, ProgramacaoRecorrente, Rota, Veiculo, Viagem
@@ -80,6 +80,30 @@ class PassageiroForm(forms.ModelForm):
         fields = '__all__'
 
 
+class SeletorPassageirosWidget(forms.CheckboxSelectMultiple):
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        option = super().create_option(name, value, label, selected, index, subindex, attrs)
+        passageiro = getattr(value, 'instance', None)
+        if passageiro is not None:
+            option['attrs']['data-documento'] = passageiro.documento
+            option['attrs']['data-ativo'] = 'true' if passageiro.ativo else 'false'
+            option['attrs']['data-vinculado'] = (
+                'true' if passageiro.possui_viagem or passageiro.possui_recorrencia else 'false'
+            )
+        return option
+
+
+def preparar_seletor_passageiros(campo):
+    campo.queryset = campo.queryset.annotate(
+        possui_viagem=Exists(
+            Viagem.passageiros.through.objects.filter(passageiro_id=OuterRef('pk'))
+        ),
+        possui_recorrencia=Exists(
+            ProgramacaoRecorrente.passageiros.through.objects.filter(passageiro_id=OuterRef('pk'))
+        ),
+    )
+
+
 class ViagemForm(forms.ModelForm):
     class Meta:
         model = Viagem
@@ -88,7 +112,7 @@ class ViagemForm(forms.ModelForm):
             'data_hora_partida': forms.DateTimeInput(
                 format='%Y-%m-%dT%H:%M', attrs={'type': 'datetime-local'}
             ),
-            'passageiros': forms.CheckboxSelectMultiple,
+            'passageiros': SeletorPassageirosWidget,
         }
 
     def __init__(self, *args, **kwargs):
@@ -104,7 +128,11 @@ class ViagemForm(forms.ModelForm):
         self.fields['veiculo'].queryset = Veiculo.objects.filter(
             Q(situacao=Veiculo.Situacao.DISPONIVEL) | Q(pk=atual.veiculo_id)
         )
-        self.fields['passageiros'].queryset = Passageiro.objects.filter(ativo=True)
+        selecionaveis = Q(ativo=True)
+        if self.instance.pk:
+            selecionaveis |= Q(pk__in=self.instance.passageiros.values('pk'))
+        self.fields['passageiros'].queryset = Passageiro.objects.filter(selecionaveis)
+        preparar_seletor_passageiros(self.fields['passageiros'])
 
     def clean(self):
         dados = super().clean()
@@ -167,7 +195,7 @@ class ProgramacaoRecorrenteForm(forms.ModelForm):
             'data_inicio': campo_data(),
             'data_fim': campo_data(),
             'hora_partida': forms.TimeInput(format='%H:%M', attrs={'type': 'time'}),
-            'passageiros': forms.CheckboxSelectMultiple,
+            'passageiros': SeletorPassageirosWidget,
         }
 
     def __init__(self, *args, **kwargs):
@@ -190,6 +218,7 @@ class ProgramacaoRecorrenteForm(forms.ModelForm):
             Q(ativo=True) | Q(programacaorecorrente=self.instance)
         ).distinct() if self.instance.pk else Passageiro.objects.filter(ativo=True)
         self.fields['passageiros'].required = True
+        preparar_seletor_passageiros(self.fields['passageiros'])
 
     def clean_dias_semana(self):
         dias = self.cleaned_data['dias_semana']
